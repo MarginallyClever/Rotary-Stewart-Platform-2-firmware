@@ -1,0 +1,17 @@
+Bill of Materials 2013-09-16
+---------------------------------------------
+1x Arduino UNO R3
+3x Adafruit Motor Shield v2
+6x NEMA17 400 steps per turn
+1x USB cable, 1.5m
+1x 12v2a power supply
+1x 1 female to 3 male 5.5x2.1 power cable
+3x Power cable, 5.5x2.1
+6x micro switches
+1x laser cut parts
+6x M3x150 threaded rod
+6x M3x5 pan phillips screw
+18x M3x15 pan phillips screws
+18x M3 hex nuts
+12x Traxxas ball joints
+10x 2x60 zip ties 
