@@ -20,27 +20,22 @@
 #define BAUD                 (57600)  // How fast is the Arduino talking?
 #define MAX_BUF              (64)  // What is the longest message Arduino can store?
 #define STEPS_PER_TURN       (400)  // depends on your stepper motor.  most are 200.
-#define MIN_STEP_DELAY       (1500)
+#define MIN_STEP_DELAY       (50)
 #define MAX_FEEDRATE         (1000000/MIN_STEP_DELAY)
 #define MIN_FEEDRATE         (0.01)
 #define NUM_AXIES            (6)
+#define MICROSTEP_MUL        (16.0)
 
 // measurements based on computer model of robot
 #define BICEP_LENGTH         (5.01)
 #define FOREARM_LENGTH       (16.75)
 #define CIRCUMFERENCE        (BICEP_LENGTH*PI*2.0)
-#define STEP_DISTANCE        (CIRCUMFERENCE/16.0/STEPS_PER_TURN)
-
-// changes the definition in Wire/ulitilty/twi.h to speed up onestep()
-#define TWI_FREQ 400000L
+#define STEP_DISTANCE        ((CIRCUMFERENCE/MICROSTEP_MUL)/STEPS_PER_TURN)
 
 
 //------------------------------------------------------------------------------
 // INCLUDES
 //------------------------------------------------------------------------------
-#include <Wire.h>
-#include <Adafruit_MotorShield.h>
-//#include "utility/Adafruit_PWMServoDriver.h"
 
 
 //------------------------------------------------------------------------------
@@ -56,30 +51,19 @@ typedef struct {
 } Axis;
 
 
-// limit switches
 typedef struct {
-  char pin;
-  int state;
-} Switch;
-
-
-typedef struct {
-  // Connect stepper motors with 400 steps per revolution (1.8 degree)
-  // Create the motor shield object with the default I2C address
-  Adafruit_StepperMotor *m;
-  Switch s;  // switch state
-  int scale;  // flip direction of switches if necessary
+  int motor_step_pin;
+  int motor_dir_pin;
+  int motor_enable_pin;
+  int motor_scale;  // 1 or -1
+  int limit_switch_pin;
+  int limit_switch_state;  
 } Arm;
 
 
 //------------------------------------------------------------------------------
 // GLOBALS
 //------------------------------------------------------------------------------
-// Initialize Adafruit stepper controller
-Adafruit_MotorShield AFMS0 = Adafruit_MotorShield(0x60);
-Adafruit_MotorShield AFMS1 = Adafruit_MotorShield(0x63);
-Adafruit_MotorShield AFMS2 = Adafruit_MotorShield(0x61);
-
 Arm arms[NUM_AXIES];
 
 Axis a[NUM_AXIES];  // for line()
@@ -91,12 +75,13 @@ int sofar;  // how much is in the buffer
 // speeds
 float fr=0;  // human version
 long step_delay;  // machine version
+int step_delay_s;
+int step_delay_us;
 
 float px,py,pz,pu,pv,pw;  // position
 
 // settings
 char mode_abs=1;  // absolute mode?
-int step_type=MICROSTEP;
 
 #ifdef VERBOSE
 char *letter="UVWXYZ";
@@ -113,8 +98,8 @@ char *letter="UVWXYZ";
  * @input ms how many milliseconds to wait
  */
 void pause(long ms) {
-  delay(ms/1000);
-  delayMicroseconds(ms%1000);  // delayMicroseconds doesn't work for ms values > ~16k.
+  delay( step_delay_s );
+  delayMicroseconds( step_delay_us );  // delayMicroseconds doesn't work for ms values > ~16k.
 }
 
 
@@ -138,6 +123,8 @@ void feedrate(float nfr) {
     nfr=MIN_FEEDRATE;
   }
   step_delay = 1000000.0/nfr;
+  step_delay_s  = step_delay / 1000;
+  step_delay_us = step_delay % 1000;
   fr=nfr;
 }
 
@@ -167,18 +154,31 @@ void onestep(int motor,int dir) {
 #ifdef VERBOSE
   Serial.print(letter[motor]);
 #endif
-  dir *= arms[motor].scale;
-  arms[motor].m->onestep( dir>0 ? FORWARD : BACKWARD, step_type );
+  dir *= arms[motor].motor_scale;
+  digitalWrite(arms[motor].motor_dir_pin,dir>0?LOW:HIGH);
+  digitalWrite(arms[motor].motor_step_pin,LOW);
+  digitalWrite(arms[motor].motor_step_pin,HIGH);
+}
+
+
+/**
+ * Grips the power on the motors
+ **/
+void motor_enable() {
+  int i;
+  for(i=0;i<NUM_AXIES;++i) {
+    digitalWrite(arms[i].motor_enable_pin,LOW);
+  }
 }
 
 
 /**
  * Releases the power on the motors
  **/
-void release() {
+void motor_disable() {
   int i;
   for(i=0;i<NUM_AXIES;++i) {
-    arms[i].m->release();
+    digitalWrite(arms[i].motor_enable_pin,HIGH);
   }
 }
 
@@ -290,10 +290,10 @@ void where() {
  * display helpful information
  */
 void help() {
-  Serial.print(F("StewartPlatform v4-"));
+  Serial.print(F("StewartPlatform v4-2"));
   Serial.println(VERSION);
   Serial.println(F("Commands:"));
-  Serial.println(F("M18; - disable motors"));
+  Serial.println(F("M17/M18; - enable/disable motors"));
   Serial.println(F("M100; - this help message"));
   Serial.println(F("M114; - report position and feedrate"));
   Serial.println(F("F, G00, G01, G04, G28, G90, G91, G92 as described by http://en.wikipedia.org/wiki/G-code"));
@@ -333,9 +333,8 @@ void processCommand() {
 
   cmd = parsenumber('M',-1);
   switch(cmd) {
-  case 18:  // disable motors
-    release();
-    break;
+  case 17:  motor_enable();  break;
+  case 18:  motor_disable();  break;
   case 100:  help();  break;
   case 114:  where();  break;
   default:  break;
@@ -361,13 +360,13 @@ char read_switches() {
   int state;
   
   for(i=0;i<6;++i) {
-    state=digitalRead(arms[i].s.pin);
+    state=digitalRead(arms[i].limit_switch_pin);
 #ifdef DEBUG_SWITCHES
     Serial.print(state);
     Serial.print('\t');
 #endif
-    if(arms[i].s.state != state) {
-      arms[i].s.state = state;
+    if(arms[i].limit_switch_state != state) {
+      arms[i].limit_switch_state = state;
 #ifdef DEBUG_SWITCHES
       Serial.print(F("Switch "));
       Serial.println(i,DEC);
@@ -386,13 +385,18 @@ char read_switches() {
  * setup the limit switches
  */
 void setup_switches() {
-  char i;
-
-  for(i=0;i<6;++i) {
-    arms[i].s.pin=8+i;
-    arms[i].s.state=HIGH;
-    pinMode(arms[i].s.pin,INPUT);
-    digitalWrite(arms[i].s.pin,HIGH);
+  arms[0].limit_switch_pin=37;
+  arms[1].limit_switch_pin=36;
+  arms[2].limit_switch_pin=35;
+  arms[3].limit_switch_pin=34;
+  arms[4].limit_switch_pin=33;
+  arms[5].limit_switch_pin=32;
+  
+  for(int i=0;i<6;++i) {  
+    // set the switch pin
+    arms[i].limit_switch_state=HIGH;
+    pinMode(arms[i].limit_switch_pin,INPUT);
+    digitalWrite(arms[i].limit_switch_pin,HIGH);
   }
 }
 
@@ -401,9 +405,6 @@ void setup_switches() {
  * Move the motors until they connect with the limit switches, then return to "zero" position.
  */
 void find_home() {
-  int old_step_type = step_type;
-  step_type = MICROSTEP;
-
   char i;
   // until all switches are hit
   while(read_switches()<6) {
@@ -413,7 +414,7 @@ void find_home() {
     // for each stepper,
     for(i=0;i<6;++i) {
       // if this switch hasn't been hit yet
-      if(arms[i].s.state == HIGH) {
+      if(arms[i].limit_switch_state == HIGH) {
         // move "down"
         onestep(i,-1);
       }
@@ -423,7 +424,7 @@ void find_home() {
   // The arms are 19.69 degrees from straight down when they hit the switch.
   // @TODO: This could be better customized in firmware.
   float horizontal = 90.00 - 19.69;
-  long steps_to_zero = STEPS_PER_TURN*MICROSTEPS * horizontal / 360.00;
+  long steps_to_zero = STEPS_PER_TURN * MICROSTEP_MUL * horizontal / 360.00;
 #ifdef VERBOSE
   Serial.print("steps=");
   Serial.println(step_size);
@@ -435,7 +436,6 @@ void find_home() {
     }
   }
   position(0,0,0,0,0,0);
-  step_type=old_step_type;
 }
 
 
@@ -443,23 +443,37 @@ void find_home() {
  * setup the motor shields
  */
 void setup_shields() {
-  AFMS0.begin(); // Start the shields
-  AFMS1.begin();
-  AFMS2.begin();
+  arms[0].motor_step_pin=17;
+  arms[0].motor_dir_pin=16;
+  arms[0].motor_enable_pin=48;
+
+  arms[1].motor_step_pin=54;
+  arms[1].motor_dir_pin=47;
+  arms[1].motor_enable_pin=55;
+
+  arms[2].motor_step_pin=57;
+  arms[2].motor_dir_pin=56;
+  arms[2].motor_enable_pin=62;
+
+  arms[3].motor_step_pin=23;
+  arms[3].motor_dir_pin=22;
+  arms[3].motor_enable_pin=27;
+
+  arms[4].motor_step_pin=26;
+  arms[4].motor_dir_pin=25;
+  arms[4].motor_enable_pin=24;
+
+  arms[5].motor_step_pin=29;
+  arms[5].motor_dir_pin=28;
+  arms[5].motor_enable_pin=39;
   
-  arms[0].m = AFMS0.getStepper(STEPS_PER_TURN, 1);  // X
-  arms[1].m = AFMS0.getStepper(STEPS_PER_TURN, 2);  // Y
-  arms[2].m = AFMS1.getStepper(STEPS_PER_TURN, 1);  // Z
-  arms[3].m = AFMS1.getStepper(STEPS_PER_TURN, 2);  // U
-  arms[4].m = AFMS2.getStepper(STEPS_PER_TURN, 1);  // V
-  arms[5].m = AFMS2.getStepper(STEPS_PER_TURN, 2);  // W
-  
-  arms[0].scale =  1;
-  arms[1].scale = -1;
-  arms[2].scale =  1;
-  arms[3].scale = -1;
-  arms[4].scale =  1;
-  arms[5].scale = -1;
+  for(int i=0;i<6;++i) {  
+    // set the motor pin & scale
+    arms[i].motor_scale=((i%2)? -1:1);
+    pinMode(arms[i].motor_step_pin,OUTPUT);
+    pinMode(arms[i].motor_dir_pin,OUTPUT);
+    pinMode(arms[i].motor_enable_pin,OUTPUT);
+  }
 }
 
 
@@ -472,10 +486,9 @@ void setup() {
 
   setup_shields();
   setup_switches();
-  feedrate(400);  // set default speed
+  feedrate(6400);  // set default speed
+  motor_enable();
   position(0,0,0,0,0,0);
-  line(1,1,1,1,1,1);
-  line(0,0,0,0,0,0);
   
   ready();
 }
@@ -500,22 +513,26 @@ void loop() {
     processCommand();  // do something with the command
     ready();
   }
+
+#ifdef DEBUG_SWITCHES  
+  read_switches();
+#endif
 }
 
 
 /**
-* This file is part of GcodeCNCDemo.
+* This file is part of Stewart Platform v2.
 *
-* GcodeCNCDemo is free software: you can redistribute it and/or modify
+* Stewart Platform v2 is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
 *
-* GcodeCNCDemo is distributed in the hope that it will be useful,
+* Stewart Platform v2 is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with Foobar. If not, see <http://www.gnu.org/licenses/>.
+* along with Stewart Platform v2. If not, see <http://www.gnu.org/licenses/>.
 */
