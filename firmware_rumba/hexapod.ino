@@ -97,14 +97,6 @@ void hexapod_build_model() {
   cc=bb;
   bb=sqrt((cc*cc)-(aa*aa));
   h.ee.relative.z=bb+B2S_Z-T2W_Z;
-  //h.ee.pos=h.ee.relative;
-
-//#ifdef VERBOSE
-  Serial.print("aa=");  Serial.println(aa);
-  Serial.print("cc=");  Serial.println(cc);
-  Serial.print("bb=");  Serial.println(bb);
-  Serial.print("ee.z=");  Serial.println(h.ee.relative.z);
-//#endif
 
   hexapod_update_ik(h.ee.relative,zero);
 }
@@ -350,22 +342,26 @@ void hexapod_line(float newx,float newy,float newz,float newu,float newv,float n
   long steps_pos=ceil(dpos.Length()/MICROSTEP_DISTANCE);
   long steps_rpy=ceil(drpy.Length()/MICROSTEP_DISTANCE);
   long steps = ( steps_pos > steps_rpy ? steps_pos : steps_rpy);
-  if( steps>=MAX_SEGMENTS) steps=MAX_SEGMENTS-1;
   // ** END TOTAL JUNK
 
-//#ifdef VERBOSE  
+  if( steps>=MAX_SEGMENTS-1) steps=MAX_SEGMENTS-2;
+
+#ifdef VERBOSE  
   Serial.print(steps);
   Serial.println(" steps.");
-//#endif
+#endif
 
-  if(steps==0) steps=1;
+  if(steps==0) return;
+ 
+  float istep = 1.0/(float)steps;
 
   long i;
   int j;
   
   for(i=0;i<=steps;++i) {
-    ipos=startpos+dpos*((float)i/steps);
-    irpy=startrpy+drpy*((float)i/steps);
+    ipos=startpos+dpos*(i*istep);
+    irpy=startrpy+drpy*(i*istep);
+    
     hexapod_update_ik(ipos,irpy);
 
 #ifdef VERBOSE    
@@ -383,7 +379,7 @@ void hexapod_line(float newx,float newy,float newz,float newu,float newv,float n
       h.arms[j].new_step = h.arms[j].angle * MICROSTEP_PER_DEGREE;
     }
     
-#ifdef VERBOSE    
+//#ifdef VERBOSE    
     Serial.print(i);
     Serial.print(" = ");    Serial.print(h.arms[0].new_step);
     Serial.print(F(", "));  Serial.print(h.arms[1].new_step);
@@ -391,14 +387,14 @@ void hexapod_line(float newx,float newy,float newz,float newu,float newv,float n
     Serial.print(F(", "));  Serial.print(h.arms[3].new_step);
     Serial.print(F(", "));  Serial.print(h.arms[4].new_step);
     Serial.print(F(", "));  Serial.println(h.arms[5].new_step);
-#endif
+//#endif
 
     motor_prepare_segment(h.arms[0].new_step,
-               h.arms[1].new_step,
-               h.arms[2].new_step,
-               h.arms[3].new_step,
-               h.arms[4].new_step,
-               h.arms[5].new_step);
+                          h.arms[1].new_step,
+                          h.arms[2].new_step,
+                          h.arms[3].new_step,
+                          h.arms[4].new_step,
+                          h.arms[5].new_step);
   }
 
   motor_move_all_segments();

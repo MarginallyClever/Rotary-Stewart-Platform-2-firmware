@@ -13,7 +13,7 @@
 //------------------------------------------------------------------------------
 
 
-#define MAX_SEGMENTS         (32)
+#define MAX_SEGMENTS         (64)
 
 
 //------------------------------------------------------------------------------
@@ -28,12 +28,12 @@ struct Axis {
   int absdelta;
   int dir;
   int over;
-  int motor;
 };
 
 
 struct Segment {
   Axis a[NUM_AXIES];
+  int steps;
 };
 
 

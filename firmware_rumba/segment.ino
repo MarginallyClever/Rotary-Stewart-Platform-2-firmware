@@ -38,7 +38,7 @@ int get_prev_segment(int i) {
 
 
 /**
- * add a segment to the line buffer if there is room.
+ * Add a segment to the line buffer if there is room.
  */
 void motor_prepare_segment(int n0,int n1,int n2,int n3,int n4,int n5) {
   int next_segment = get_next_segment(last_segment);
@@ -63,35 +63,23 @@ void motor_prepare_segment(int n0,int n1,int n2,int n3,int n4,int n5) {
   new_seg.a[3].delta = n3 - old_seg.a[3].step_count;
   new_seg.a[4].delta = n4 - old_seg.a[4].step_count;
   new_seg.a[5].delta = n5 - old_seg.a[5].step_count;
-  
-  int i,j;
 
+  new_seg.steps=0;
+
+  int i,j;
   for(i=0;i<NUM_AXIES;++i) {
-    new_seg.a[i].motor = i;
+    new_seg.a[i].over=0;
     new_seg.a[i].dir = (new_seg.a[i].delta > 0 ? 1:-1);
     new_seg.a[i].absdelta = abs(new_seg.a[i].delta);
+    if( new_seg.steps < new_seg.a[i].absdelta ) {
+      new_seg.steps = new_seg.a[i].absdelta;
+    }
   }
 
-  // sort the axies with the fastest mover at the front of the list
-  Axis atemp;
-  int jmax;
-  for(i=0;i<NUM_AXIES;++i) {
-    jmax=i;
-    for(j=i+1;j<NUM_AXIES;++j) {
-      if(new_seg.a[j].absdelta > new_seg.a[i].absdelta) {
-        jmax=j;
-      }
-    }
-    if(i!=jmax) {
-      memcpy(&atemp          ,&new_seg.a[i]   ,sizeof(Axis));
-      memcpy(&new_seg.a[i]   ,&new_seg.a[jmax],sizeof(Axis));
-      memcpy(&new_seg.a[jmax],&atemp          ,sizeof(Axis));
-    }
-    new_seg.a[i].over=0;
-  }
-  
+#ifdef VERBOSE
   Serial.print(F("Added segment "));
   Serial.println(last_segment);
+#endif
   last_segment=get_next_segment(last_segment);
 }
 
@@ -103,21 +91,14 @@ void motor_prepare_segment(int n0,int n1,int n2,int n3,int n4,int n5) {
 void motor_move_segment(Segment &seg) {
   int i,j;
   
-  Axis &a0 = seg.a[0];
-  
-  for(i=0;i<a0.absdelta;++i) {
-    onestep( a0.motor, a0.dir );
-    h.arms[a0.motor].last_step += a0.dir;
-    
-    for(j=1;j<NUM_AXIES;++j) {
-      Axis &aj = seg.a[j];
+  for(i=0;i<seg.steps;++i) {
+    for(j=0;j<NUM_AXIES;++j) {
+      Axis &a = seg.a[j];
       
-      aj.over += aj.absdelta;
-      if(aj.over >= a0.absdelta) {
-        aj.over -= a0.absdelta;
-        
-        onestep( aj.motor, aj.dir );
-        h.arms[aj.motor].last_step += aj.dir;
+      a.over += a.absdelta;
+      if(a.over >= seg.steps) {
+        a.over -= seg.steps;
+        onestep( j, a.dir );
       }
     }
     // @TODO: change to seg.step_delay?
@@ -133,11 +114,12 @@ void motor_move_all_segments() {
   while(current_segment!=last_segment) {
     current_segment = get_next_segment(current_segment);
     
+#ifdef VERBOSE
     Serial.print(F("line_segments["));
     Serial.print(current_segment);
     Serial.print(F("].a[0].delta="));
     Serial.println(line_segments[current_segment].a[0].delta);
-    
+#endif    
     motor_move_segment(line_segments[current_segment]);
   }
 }

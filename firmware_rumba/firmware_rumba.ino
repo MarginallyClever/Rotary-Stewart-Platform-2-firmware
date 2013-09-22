@@ -80,15 +80,13 @@ void motor_position(int n0,int n1,int n2,int n3,int n4,int n5) {
   h.arms[5].last_step=n5;
   
   // @TODO: not sure this is right...
-  if( current_segment == last_segment ) {
-    Segment &seg = line_segments[current_segment];
-    seg.a[0].step_count=n0;
-    seg.a[1].step_count=n1;
-    seg.a[2].step_count=n2;
-    seg.a[3].step_count=n3;
-    seg.a[4].step_count=n4;
-    seg.a[5].step_count=n5;
-  }
+  Segment &seg = line_segments[last_segment];
+  seg.a[0].step_count=n0;
+  seg.a[1].step_count=n1;
+  seg.a[2].step_count=n2;
+  seg.a[3].step_count=n3;
+  seg.a[4].step_count=n4;
+  seg.a[5].step_count=n5;
 }
 
 
