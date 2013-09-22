@@ -1,3 +1,5 @@
+#ifndef VECTOR3_H
+#define VECTOR3_H
 //------------------------------------------------------------------------------
 // Stewart Platform v2 - Supports RUMBA 6-axis motor shield
 // dan@marginallycelver.com 2013-09-20
@@ -290,7 +292,6 @@ public:
   }
 };
 
-
 /**
 * This file is part of Stewart Platform v2.
 *
@@ -307,3 +308,4 @@ public:
 * You should have received a copy of the GNU General Public License
 * along with Stewart Platform v2. If not, see <http://www.gnu.org/licenses/>.
 */
+#endif

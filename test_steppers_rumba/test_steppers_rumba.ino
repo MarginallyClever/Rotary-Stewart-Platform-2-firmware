@@ -3,7 +3,7 @@
 // dan@marginallycelver.com 2013-09-20
 //------------------------------------------------------------------------------
 // Copyright at end of file.
-// please see http://www.github.com/MarginallyClever/GcodeCNCDemo for more information.
+// please see http://www.github.com/MarginallyClever/RotaryStewartPlatform2 for more information.
 
 
 #define BAUD    57600

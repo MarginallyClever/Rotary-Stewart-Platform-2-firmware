@@ -3,7 +3,7 @@
 // dan@marginallycelver.com 2013-09-07
 //------------------------------------------------------------------------------
 // Copyright at end of file.
-// please see http://www.github.com/MarginallyClever/GcodeCNCDemo for more information.
+// please see http://www.github.com/MarginallyClever/RotaryStewartPlatform2 for more information.
 
 /**
  * top center to wrist hole: X76.35 Y+/-5.53 Z8.7
