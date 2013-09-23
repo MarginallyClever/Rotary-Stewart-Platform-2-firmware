@@ -91,22 +91,6 @@ void motor_position(int n0,int n1,int n2,int n3,int n4,int n5) {
 
 
 /**
- * Move one motor in a given direction
- * @input the motor number [0...6]
- * @input the direction to move 1 for forward, -1 for backward
- **/
-void onestep(int motor,int dir) {
-#ifdef VERBOSE
-  Serial.print(letter[motor]);
-#endif
-  dir *= h.arms[motor].motor_scale;
-  digitalWrite(h.arms[motor].motor_dir_pin,dir>0?LOW:HIGH);
-  digitalWrite(h.arms[motor].motor_step_pin,LOW);
-  digitalWrite(h.arms[motor].motor_step_pin,HIGH);
-}
-
-
-/**
  * Grips the power on the motors
  **/
 void motor_enable() {
@@ -168,38 +152,6 @@ void help() {
   Serial.println(F("M114; - report position and feedrate"));
   Serial.println(F("F, G00, G01, G04, G28, G90, G91 as described by http://en.wikipedia.org/wiki/G-code"));
   // See hexapod_position() for note about why G92 is removed
-}
-
-
-
-
-/**
- * read the limit switch states
- * @return 1 if a switch is being hit
- */
-char read_switches() {
-  char i, hit=0;
-  int state;
-  
-  for(i=0;i<6;++i) {
-    state=digitalRead(h.arms[i].limit_switch_pin);
-#ifdef DEBUG_SWITCHES
-    Serial.print(state);
-    Serial.print('\t');
-#endif
-    if(h.arms[i].limit_switch_state != state) {
-      h.arms[i].limit_switch_state = state;
-#ifdef DEBUG_SWITCHES
-      Serial.print(F("Switch "));
-      Serial.println(i,DEC);
-#endif
-    }
-    if(state == LOW) ++hit;
-  }
-#ifdef DEBUG_SWITCHES
-  Serial.print('\n');
-#endif
-  return hit;
 }
 
 

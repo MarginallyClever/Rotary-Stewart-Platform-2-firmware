@@ -83,13 +83,18 @@ void motor_prepare_segment(int n0,int n1,int n2,int n3,int n4,int n5) {
   last_segment=get_next_segment(last_segment);
 }
 
-
+ 
 /**
- * Uses bresenham's line algorithm to move both motors
+ * Uses bresenham's line algorithm to move both motors.  Optimized to faster than onestep()
  * @input seg the line segment to move
  **/
 void motor_move_segment(Segment &seg) {
   int i,j;
+  
+  // set the directions once per segment
+  for(j=0;j<NUM_AXIES;++j) {
+    digitalWrite( h.arms[j].motor_dir_pin, (seg.a[j].dir * h.arms[j].motor_scale > 0 )? LOW:HIGH );
+  }
   
   for(i=0;i<seg.steps;++i) {
     for(j=0;j<NUM_AXIES;++j) {
@@ -98,7 +103,9 @@ void motor_move_segment(Segment &seg) {
       a.over += a.absdelta;
       if(a.over >= seg.steps) {
         a.over -= seg.steps;
-        onestep( j, a.dir );
+        
+        digitalWrite(h.arms[j].motor_step_pin,HIGH);
+        digitalWrite(h.arms[j].motor_step_pin,LOW);
       }
     }
     // @TODO: change to seg.step_delay?

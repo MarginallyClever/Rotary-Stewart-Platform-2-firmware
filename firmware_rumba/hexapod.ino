@@ -417,6 +417,53 @@ void hexapod_position(float npx,float npy,float npz,float npu,float npv,float np
 
 
 /**
+ * read the limit switch states
+ * @return 1 if a switch is being hit
+ */
+char hexapod_read_switches() {
+  char i, hit=0;
+  int state;
+  
+  for(i=0;i<6;++i) {
+    state=digitalRead(h.arms[i].limit_switch_pin);
+#ifdef DEBUG_SWITCHES
+    Serial.print(state);
+    Serial.print('\t');
+#endif
+    if(h.arms[i].limit_switch_state != state) {
+      h.arms[i].limit_switch_state = state;
+#ifdef DEBUG_SWITCHES
+      Serial.print(F("Switch "));
+      Serial.println(i,DEC);
+#endif
+    }
+    if(state == LOW) ++hit;
+  }
+#ifdef DEBUG_SWITCHES
+  Serial.print('\n');
+#endif
+  return hit;
+}
+
+
+/**
+ * Move one motor in a given direction
+ * @input the motor number [0...6]
+ * @input the direction to move 1 for forward, -1 for backward
+ **/
+void hexapod_onestep(int motor,int dir) {
+#ifdef VERBOSE
+  Serial.print(letter[motor]);
+#endif
+  Arm &a = h.arms[motor];
+  dir *= a.motor_scale;
+  digitalWrite(a.motor_dir_pin,dir>0?LOW:HIGH);
+  digitalWrite(a.motor_step_pin,HIGH);
+  digitalWrite(a.motor_step_pin,LOW);
+}
+
+
+/**
  * Move the motors until they connect with the limit switches, then return to "zero" position.
  */
 void hexapod_find_home() {
@@ -426,16 +473,16 @@ void hexapod_find_home() {
   
   char i;
   // until all switches are hit
-  while(read_switches()<6) {
+  while(hexapod_read_switches()<6) {
 #ifdef VERBOSE
-  Serial.println(read_switches(),DEC);
+  Serial.println(hexapod_read_switches(),DEC);
 #endif
     // for each stepper,
     for(i=0;i<6;++i) {
       // if this switch hasn't been hit yet
       if(h.arms[i].limit_switch_state == HIGH) {
         // move "down"
-        onestep(i,-1);
+        hexapod_onestep(i,-1);
       }
     }
     pause(step_delay);
@@ -453,7 +500,7 @@ void hexapod_find_home() {
 
   for(;steps_to_zero>0;--steps_to_zero) {
     for(i=0;i<6;++i) {
-      onestep(i,1);
+      hexapod_onestep(i,1);
     }
     pause(step_delay);
   }
