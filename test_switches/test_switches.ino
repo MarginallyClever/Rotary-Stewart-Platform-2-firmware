@@ -28,9 +28,9 @@ void loop() {
       Serial.print(j);
       Serial.print('=');
       Serial.println(state);
-      delay(50);
     }
   }
+  delay(50);
 }
 
 

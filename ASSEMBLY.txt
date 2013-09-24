@@ -1,0 +1,125 @@
+Stewart Platform Assembly
+---------------------------
+Introduction
+	tools you will need
+	  	- soldering iron
+	  	- Arduino software
+	  	- small Phillips screwdriver
+	  	- crazy glue
+	  	- masking tape
+	open and inspect your kit
+		IMG_5941
+	  	compare with the BOM to make sure everything arrived in working order.
+  		We have checked contents before shipping.
+glueing
+	the frame
+		IMG_5944-IMG_5947
+	the top
+		IMG_5948,49,58-63
+	the biceps
+		IMG_5950-57
+		This is the hardest part!  Make sure the pieces line up correctly.
+		Once the glue has dried an M3x15 goes in the hole at the square end and is held in place with an M3 nut.
+	the forearms
+		<picture missing>
+the switches
+	soldering
+		<picture missing>
+		red is the pin closest to the roller.
+		black is the center pin.
+		blue is the pin closest to the clicker.
+	test
+		<picture of soldering>
+		connect the RUMBA controller to your computer with the USB cable provided.
+		<picture of RUMBA input pins>
+		connect the switch to an input.
+		install test_switches.ino
+		open the serial window and set the baud rate to 57600.
+		press the switch.  A column should change from 1 to 0.
+		disconnect USB.
+	install
+		thread the wire for two switches through the hole in each face.  secure the switches with zip ties so that the roller is downward.
+			<picture>
+			Switches 1 and 2 should be side-by-side.
+			Switches 3 and 4 should be side-by-side.
+			Switches 5 and 6 should be side-by-side.
+	test 2
+		connect the RUMBA controller to your computer with the USB cable provided.
+		the switches again to be sure they are in the correct order.
+		disconnect USB.
+The stepper motors
+	attach
+		<picture of wiring for stepper 0>
+		the wires order from left to right should be red, green, blue, yellow.
+		connect the 5.1x2.2 female power supply to the RUMBA
+	test one
+		connect the 12v2a power supply to the RUMBA.
+		install test_steppers_rumba.ino.  Motors will begin to move as soon as sketch uploads.
+		open the serial window to see what the code is doing.
+		when the test works, remove the stepper from the Arduino.
+		disconnect 12v power and USB.
+	install
+		<picture of tape with writing>
+		put a piece of tape on each stepper and at the far end of the wire.
+		write the stepper number on the appropriate tape.
+		<picture of steppers installed>
+		install the steppers in a clockwise order.
+			Steppers 1 and 2 should be side-by-side.
+			Stepper 1 should be above switch 1.
+			Stepper 2 should be above switch 2.
+			Repeat for steppers 3-6.
+		put the wires through the hole in the center of the frame.
+		attach the steppers in order with M3x5 screws.
+			The tape will make it easy to keep them organized.
+	test 
+		Make sure 12v power is not connected.
+		put a small piece of tape on each motor shaft so you can easily see it move.
+		install firmware_rumba_minimal.ino
+		open the serial window.
+			G00 X100; should turn stepper 1.
+			G00 Y100; should turn stepper 2 *in the opposite direction*.
+			G00 Z100; should turn stepper 3 same direction as #1.
+			G00 U100; should turn stepper 4 same direction as #2.
+			G00 V100; should turn stepper 5 same direction as #1.
+			G00 W100; should turn stepper 6 same direction as #2.
+the arms
+	attach the biceps to the forearms
+		<picture of biceps and forearms>
+	attach the forearms to the top
+		<picture of forearms and top>
+		make sure the arms are attached on the correct side. 
+	attach the biceps to the motor shafts
+		IMG_5964-66
+		use the spacer to make sure the biceps are at the correct distance from the frame.
+		make sure the biceps are facing the correct direction.
+		make sure the biceps touch the limit switches.
+the stewart platform
+	Make sure 12v power is not connected.
+	install firmware_rumba_minimal.ino
+	open the serial window.
+	Connect 12v power.
+final tests
+	M18; disables power to all stepper motors.
+		You can freely move the platform.  Don't forget gravity is in effect!
+	M17; enables power to all stepper motors.
+		Try manually holding the platform at a strange angle and enabling power.
+	Test short movements on each stepper motor.
+		M18;
+		move the platform so each bicep is approximately level.
+		M17;
+		Be prepared to disconnect 12v power if something goes wrong.
+		G00 F200 Z1; should slowly move the platform up one centimeter.
+	test homing
+		G28;
+		Steppers should immediately move "down" to touch switches and then move to home position.
+		Because of the previous F200 they will move slowly.
+	test full speed
+		G00 F800; changes speed without moving.
+		G00 X1.5; should move 15mm sideways.
+		G00 Y1.5; should move 15mm orthogonal to X and Z.
+		G00 U10; tilt 10 degrees around Y.
+		G00 V-8.25; tilt 8.25 degrees around X.
+		G00 W5; twist 5 degrees around Z.
+		G00 X0 Y0 Z0 U0 V0 W0; will move back to center, flat.
+		
+Congratulations!  Your platform is assembled and appears to be working.

@@ -167,7 +167,7 @@ void setup() {
   feedrate(800);  // set default speed
   hexapod_position(0,0,0,0,0,0);
   motor_position(0,0,0,0,0,0);
-  hexapod_find_home();
+  //hexapod_find_home();
   
   parser_ready();
 }
