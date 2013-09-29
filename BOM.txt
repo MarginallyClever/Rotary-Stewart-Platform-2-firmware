@@ -3,10 +3,10 @@ Bill of Materials 2013-09-16 Adafruit Shields
 1x Arduino
 3x Adafruit Motor Shield v2
 6x NEMA17 400 steps per turn
-1x USB cable, 1.5m
+1x USB cable, A to B, 1.5m
 1x 12v2a power supply
 3x Power cable, 5.5x2.1 1 female to 3 male 
-1x Power cable, 5.5x2.1
+1x Power cable, 5.5x2.1 female
 6x micro switches
 1x set laser cut parts
 6x M3x105 threaded rod
@@ -20,9 +20,9 @@ Bill of Materials 2013-09-20 RUMBA shields
 ---------------------------------------------
 1x RUMBA controller
 6x NEMA17 400 steps per turn
-1x USB cable, 1.5m
+1x USB cable, A to mini, 1.5m
 1x 12v2a power supply
-1x Power cable, 5.5x2.1
+1x Power cable, 5.5x2.1 female
 6x micro switches
 1x set laser cut parts
 6x M3x105 threaded rod

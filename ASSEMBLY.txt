@@ -1,6 +1,15 @@
 Stewart Platform Assembly
 ---------------------------
 Introduction
+Glueing
+The switches
+The stepper motors
+The arms
+The stewart platform
+Final tests
+
+---------------------------
+Introduction
 	tools you will need
 	  	- soldering iron
 	  	- Arduino software
@@ -11,7 +20,9 @@ Introduction
 		IMG_5941
 	  	compare with the BOM to make sure everything arrived in working order.
   		We have checked contents before shipping.
-glueing
+      
+---------------------------
+Glueing
 	the frame
 		IMG_5944-IMG_5947
 	the top
@@ -20,9 +31,9 @@ glueing
 		IMG_5950-57
 		This is the hardest part!  Make sure the pieces line up correctly.
 		Once the glue has dried an M3x15 goes in the hole at the square end and is held in place with an M3 nut.
-	the forearms
-		<picture missing>
-the switches
+    
+---------------------------
+The switches
 	soldering
 		<picture missing>
 		red is the pin closest to the roller.
@@ -47,6 +58,8 @@ the switches
 		connect the RUMBA controller to your computer with the USB cable provided.
 		the switches again to be sure they are in the correct order.
 		disconnect USB.
+    
+---------------------------
 The stepper motors
 	attach
 		<picture of wiring for stepper 0>
@@ -82,7 +95,14 @@ The stepper motors
 			G00 U100; should turn stepper 4 same direction as #2.
 			G00 V100; should turn stepper 5 same direction as #1.
 			G00 W100; should turn stepper 6 same direction as #2.
-the arms
+      
+---------------------------
+The arms
+  assemble the forearms: One ball joint goes on the end of each threaded rod.
+    There should be ~140mm of visible rod between the two ball joints.
+    The distance from center hole to center hole should be 167.5mm.
+    The holes on the rods should be aligned.
+    Use a small pair of pliers to press the metal ball into the plastic frame.
 	attach the biceps to the forearms
 		<picture of biceps and forearms>
 	attach the forearms to the top
@@ -93,12 +113,16 @@ the arms
 		use the spacer to make sure the biceps are at the correct distance from the frame.
 		make sure the biceps are facing the correct direction.
 		make sure the biceps touch the limit switches.
-the stewart platform
+    
+---------------------------
+The stewart platform
 	Make sure 12v power is not connected.
 	install firmware_rumba_minimal.ino
 	open the serial window.
 	Connect 12v power.
-final tests
+  
+---------------------------
+Final tests
 	M18; disables power to all stepper motors.
 		You can freely move the platform.  Don't forget gravity is in effect!
 	M17; enables power to all stepper motors.
