@@ -16,6 +16,7 @@ Introduction
 	  	- small Phillips screwdriver
 	  	- crazy glue
 	  	- masking tape
+      - pliers
 	open and inspect your kit
 		IMG_5941
 	  	compare with the BOM to make sure everything arrived in working order.

@@ -342,6 +342,7 @@ void hexapod_line(float newx,float newy,float newz,float newu,float newv,float n
   long steps_pos=ceil(dpos.Length()/MICROSTEP_DISTANCE);
   long steps_rpy=ceil(drpy.Length()/MICROSTEP_DISTANCE);
   long steps = ( steps_pos > steps_rpy ? steps_pos : steps_rpy);
+  if(steps>10) steps=10;
   // ** END TOTAL JUNK
 
   if( steps>=MAX_SEGMENTS-1) steps=MAX_SEGMENTS-2;
@@ -379,7 +380,7 @@ void hexapod_line(float newx,float newy,float newz,float newu,float newv,float n
       h.arms[j].new_step = h.arms[j].angle * MICROSTEP_PER_DEGREE;
     }
     
-//#ifdef VERBOSE    
+#ifdef VERBOSE    
     Serial.print(i);
     Serial.print(" = ");    Serial.print(h.arms[0].new_step);
     Serial.print(F(", "));  Serial.print(h.arms[1].new_step);
@@ -387,7 +388,7 @@ void hexapod_line(float newx,float newy,float newz,float newu,float newv,float n
     Serial.print(F(", "));  Serial.print(h.arms[3].new_step);
     Serial.print(F(", "));  Serial.print(h.arms[4].new_step);
     Serial.print(F(", "));  Serial.println(h.arms[5].new_step);
-//#endif
+#endif
 
     motor_prepare_segment(h.arms[0].new_step,
                           h.arms[1].new_step,
@@ -399,7 +400,7 @@ void hexapod_line(float newx,float newy,float newz,float newu,float newv,float n
 
   motor_move_all_segments();
   
-  // This does not take into account movements of a fraction of a step.  They will be misreported and lead to error.
+  // @TODO: This does not take into account movements of a fraction of a step.  They will be misreported and lead to error.
   hexapod_position(newx,newy,newz,newu,newv,neww);
 }
 
