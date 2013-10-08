@@ -18,18 +18,18 @@ Introduction
 	  	- masking tape
       - pliers
 	open and inspect your kit
-		IMG_5941
+		1.jpg
 	  	compare with the BOM to make sure everything arrived in working order.
   		We have checked contents before shipping.
       
 ---------------------------
 Glueing
 	the frame
-		IMG_5944-IMG_5947
+		2-5.jpg
 	the top
-		IMG_5948,49,58-63
+		6-11.jpg
 	the biceps
-		IMG_5950-57
+		12-19.jpg
 		This is the hardest part!  Make sure the pieces line up correctly.
 		Once the glue has dried an M3x15 goes in the hole at the square end and is held in place with an M3 nut.
     
@@ -110,7 +110,7 @@ The arms
 		<picture of forearms and top>
 		make sure the arms are attached on the correct side. 
 	attach the biceps to the motor shafts
-		IMG_5964-66
+		20-22.jpg
 		use the spacer to make sure the biceps are at the correct distance from the frame.
 		make sure the biceps are facing the correct direction.
 		make sure the biceps touch the limit switches.
