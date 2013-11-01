@@ -1,4 +1,4 @@
-﻿#ifndef CONFIGURATION_H
+#ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 //------------------------------------------------------------------------------
 // Stewart Platform v2 - Supports RUMBA 6-axis motor shield

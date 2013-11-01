@@ -10,7 +10,6 @@
 // INCLUDES
 //------------------------------------------------------------------------------
 #include "configuration.h"
-#include "fastio.h"
 #include "vector3.h"
 #include "segment.h"
 #include "hexapod.h"
