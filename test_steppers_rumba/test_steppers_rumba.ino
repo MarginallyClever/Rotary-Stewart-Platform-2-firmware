@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Stewart Platform v2 - Supports RUMBA 6-axis motor shield
+// Stewart Platform v2 - Supports RUMBA 6-axis motor controller
 // dan@marginallycelver.com 2013-09-20
 //------------------------------------------------------------------------------
 // Copyright at end of file.

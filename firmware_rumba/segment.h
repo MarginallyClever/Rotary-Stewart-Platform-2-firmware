@@ -34,6 +34,7 @@ struct Axis {
 struct Segment {
   Axis a[NUM_AXIES];
   int steps;
+  long step_delay;
 };
 
 

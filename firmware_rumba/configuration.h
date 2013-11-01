@@ -1,4 +1,4 @@
-#ifndef CONFIGURATION_H
+﻿#ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 //------------------------------------------------------------------------------
 // Stewart Platform v2 - Supports RUMBA 6-axis motor shield
@@ -22,7 +22,6 @@
 #define STEPS_PER_TURN       (400)  // depends on your stepper motor.  most are 200.
 #define MIN_STEP_DELAY       (150)  // depends on electronics
 
-#define NUM_AXIES            (6)
 #define MICROSTEPS           (16.0)
 
 // measurements based on computer model of robot
@@ -38,11 +37,16 @@
 #define B2S_Y                ( 2.150)
 #define B2S_Z                ( 6.618)
 
+#define STEPS_PER_CM         (10)
+#define STEPS_PER_DEG        (5)
+
 
 // ** Nothing below this line needs to be configured **
 
 
 // convenience macros
+#define NUM_AXIES            (6)
+
 #define TWOPI                (PI*2.0)
 #define DEG2RAD              (PI/180.0)
 #define RAD2DEG              (180.0/PI)

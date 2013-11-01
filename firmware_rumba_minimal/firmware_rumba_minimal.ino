@@ -47,7 +47,6 @@ typedef struct {
   long absdelta;
   int dir;
   long over;
-  int motor;
 } Axis;
 
 
@@ -196,38 +195,25 @@ void line(float newx,float newy,float newz,float newu,float newv,float neww) {
   a[4].delta = newv-pv;
   a[5].delta = neww-pw;
   
-  long i,j;
+  long i,j,maxsteps=0;
 
   for(i=0;i<NUM_AXIES;++i) {
-    a[i].motor = i;
     a[i].dir = (a[i].delta > 0 ? 1:-1);
     a[i].absdelta = abs(a[i].delta);
+    a[i].over=0;
+    if(maxsteps<a[i].absdelta) maxsteps=a[i].absdelta;
   }
   
 #ifdef VERBOSE
   Serial.println(F("Start >"));
 #endif
-
-  // sort the axies with the fastest mover at the front of the list
-  for(i=0;i<NUM_AXIES;++i) {
-    for(j=i+1;j<NUM_AXIES;++j) {
-      if(a[j].absdelta>a[i].absdelta) {
-        memcpy(&atemp,&a[i] ,sizeof(Axis));
-        memcpy(&a[i] ,&a[j] ,sizeof(Axis));
-        memcpy(&a[j] ,&atemp,sizeof(Axis));
-      }
-    }
-    a[i].over=0;
-  }
   
-  for(i=0;i<a[0].absdelta;++i) {
-    onestep(a[0].motor,a[0].dir);
-    
+  for(i=0;i<maxsteps;++i) {
     for(j=1;j<NUM_AXIES;++j) {
       a[j].over += a[j].absdelta;
-      if(a[j].over >= a[0].absdelta) {
-        a[j].over -= a[0].absdelta;
-        onestep(a[j].motor,a[j].dir);
+      if(a[j].over >= maxsteps) {
+        a[j].over -= maxsteps;
+        onestep(j,a[j].dir);
       }
     }
     pause(step_delay);

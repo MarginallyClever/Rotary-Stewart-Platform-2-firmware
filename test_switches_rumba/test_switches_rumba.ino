@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-// Stewart Platform v2 - Supports Adafruit motor shields
+// Stewart Platform v2 - Supports RUMBA 6-axis motor controller
 // dan@marginallycelver.com 2013-09-20
 //------------------------------------------------------------------------------
 // Copyright at end of file.
@@ -8,10 +8,11 @@
 
 int old_state[6];
 
+
 void setup() {
   Serial.begin(57600);
   for(int i=0;i<6;++i) {
-    int j=8+i;
+    int j=37-i;
     pinMode(j,INPUT);
     digitalWrite(j,HIGH);
     old_state[i]=-1;
@@ -21,7 +22,7 @@ void setup() {
 
 void loop() {
   for(int i=0;i<6;++i) {
-    int j=8+i;
+    int j=37-i;
     int state=digitalRead(j);
     if(old_state[i] != state) {
       old_state[i] = state;

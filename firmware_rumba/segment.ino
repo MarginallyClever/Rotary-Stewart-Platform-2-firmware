@@ -11,6 +11,7 @@
 //------------------------------------------------------------------------------
 #include "configuration.h"
 #include "segment.h"
+#include "fastio.h"
 
 
 //------------------------------------------------------------------------------
@@ -65,11 +66,12 @@ void motor_prepare_segment(int n0,int n1,int n2,int n3,int n4,int n5) {
   new_seg.a[5].delta = n5 - old_seg.a[5].step_count;
 
   new_seg.steps=0;
+  new_seg.step_delay=step_delay;
 
   int i,j;
   for(i=0;i<NUM_AXIES;++i) {
-    new_seg.a[i].over=0;
-    new_seg.a[i].dir = (new_seg.a[i].delta > 0 ? 1:-1);
+    new_seg.a[i].over = 0;
+    new_seg.a[i].dir = (new_seg.a[i].delta * h.arms[i].motor_scale > 0 ? LOW:HIGH);
     new_seg.a[i].absdelta = abs(new_seg.a[i].delta);
     if( new_seg.steps < new_seg.a[i].absdelta ) {
       new_seg.steps = new_seg.a[i].absdelta;
@@ -85,49 +87,35 @@ void motor_prepare_segment(int n0,int n1,int n2,int n3,int n4,int n5) {
 
  
 /**
- * Uses bresenham's line algorithm to move both motors.  Optimized to faster than onestep()
- * @input seg the line segment to move
- **/
-void motor_move_segment(Segment &seg) {
-  int i,j;
-  
-  // set the directions once per segment
-  for(j=0;j<NUM_AXIES;++j) {
-    digitalWrite( h.arms[j].motor_dir_pin, (seg.a[j].dir * h.arms[j].motor_scale > 0 )? LOW:HIGH );
-  }
-  
-  for(i=0;i<seg.steps;++i) {
-    for(j=0;j<NUM_AXIES;++j) {
-      Axis &a = seg.a[j];
-      
-      a.over += a.absdelta;
-      if(a.over >= seg.steps) {
-        a.over -= seg.steps;
-        
-        digitalWrite(h.arms[j].motor_step_pin,HIGH);
-        digitalWrite(h.arms[j].motor_step_pin,LOW);
-      }
-    }
-    // @TODO: change to seg.step_delay?
-    pause(step_delay);
-  }
-}
-
-
-/**
- * process all line segments in the ring buffer
+ * Process all line segments in the ring buffer.  Uses bresenham's line algorithm to move all motors.
  */
 void motor_move_all_segments() {
+  int i,j,s;
+  
   while(current_segment!=last_segment) {
     current_segment = get_next_segment(current_segment);
+    Segment &seg = line_segments[current_segment];
     
-#ifdef VERBOSE
-    Serial.print(F("line_segments["));
-    Serial.print(current_segment);
-    Serial.print(F("].a[0].delta="));
-    Serial.println(line_segments[current_segment].a[0].delta);
-#endif    
-    motor_move_segment(line_segments[current_segment]);
+    // set the directions once per segment
+    for(j=0;j<NUM_AXIES;++j) {
+      digitalWrite( h.arms[j].motor_dir_pin, seg.a[j].dir );
+    }
+    
+    s=seg.steps;
+    
+    for(i=0;i<s;++i) {
+      for(j=0;j<NUM_AXIES;++j) {
+        Axis &a = seg.a[j];
+        
+        a.over += a.absdelta;
+        if(a.over >= s) {
+          a.over -= s;
+          digitalWrite(h.arms[j].motor_step_pin,LOW);
+          digitalWrite(h.arms[j].motor_step_pin,HIGH);
+        }
+      }
+      pause(seg.step_delay);
+    }
   }
 }
 

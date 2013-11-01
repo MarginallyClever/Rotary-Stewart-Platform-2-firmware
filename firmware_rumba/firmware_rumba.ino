@@ -10,6 +10,7 @@
 // INCLUDES
 //------------------------------------------------------------------------------
 #include "configuration.h"
+#include "fastio.h"
 #include "vector3.h"
 #include "segment.h"
 #include "hexapod.h"
@@ -34,12 +35,12 @@ char *letter="UVWXYZ";
 // METHODS
 //------------------------------------------------------------------------------
 /**
- * delay for the appropriate number of microseconds
- * @input ms how many milliseconds to wait
+ * Delay for the appropriate time. delayMicroseconds() doesn't work for ms values > ~16k.
+ * @input us how many microseconds to wait
  */
-void pause(long ms) {
-  delay(ms/1000);
-  delayMicroseconds(ms%1000);  // delayMicroseconds doesn't work for ms values > ~16k.
+void pause(long us) {
+  delay(us/1000);
+  delayMicroseconds(us%1000);
 }
 
 

@@ -60,7 +60,7 @@ void hexapod_setup() {
   h.arms[5].motor_enable_pin=39;
   h.arms[5].limit_switch_pin=32;
   
-  for(i=0;i<6;++i) {  
+  for(i=0;i<NUM_AXIES;++i) {  
     // set the motor pin & scale
     h.arms[i].motor_scale=((i%2)? -1:1);
     pinMode(h.arms[i].motor_step_pin,OUTPUT);
@@ -324,8 +324,6 @@ void hexapod_update_shoulder_angles() {
  * @input newy the destination y position
  **/
 void hexapod_line(float newx,float newy,float newz,float newu,float newv,float neww) {
-  motor_enable();
-  
   Vector3 endpos(newx,newy,newz);
   Vector3 endrpy(newu,newv,neww);
 
@@ -339,17 +337,17 @@ void hexapod_line(float newx,float newy,float newz,float newu,float newv,float n
 
   //@TODO: find which of the wrist positions moves the furthest, base everything on that.
   // ** BEGIN TOTAL JUNK
-  long steps_pos=ceil(dpos.Length()/MICROSTEP_DISTANCE);
-  long steps_rpy=ceil(drpy.Length()/MICROSTEP_DISTANCE);
+  long steps_pos=ceil(dpos.Length()/STEPS_PER_CM);
+  long steps_rpy=ceil(drpy.Length()/STEPS_PER_DEG);
   long steps = ( steps_pos > steps_rpy ? steps_pos : steps_rpy);
-  if(steps>10) steps=10;
+  if(steps>MAX_SEGMENTS) steps=MAX_SEGMENTS;
   // ** END TOTAL JUNK
 
   if( steps>=MAX_SEGMENTS-1) steps=MAX_SEGMENTS-2;
 
 #ifdef VERBOSE  
   Serial.print(steps);
-  Serial.println(" steps.");
+  Serial.println(F(" steps."));
 #endif
 
   if(steps==0) return;
