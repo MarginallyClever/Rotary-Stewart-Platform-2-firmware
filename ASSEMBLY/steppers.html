@@ -10,46 +10,47 @@ body {
 <body>
 
 <p><a href='ASSEMBLY.html>'>Index</a></p>
-<p><a href='switches.html>'>&laquo; Prev</a></p>
+<p><a href='switches.html>'>&laquo; Prev</a> | <a href='arms.html'>Next &raquo;</a></p>
 
 <h2>The stepper motors</h2>
-	<h3>attach</h3>
-		<picture of wiring for stepper 0>
-		the wires order from left to right should be red, green, blue, yellow.
-		connect the 5.1x2.2 female power supply to the RUMBA
-	<h3>test one</h3>
-		connect the 12v2a power supply to the RUMBA.
-		install test_steppers_rumba.ino.  Motors will begin to move as soon as sketch uploads.
-		open the serial window to see what the code is doing.
-		when the test works, remove the stepper from the Arduino.
-		disconnect 12v power and USB.
-	<h3>install</h3>
+	<h3>Attach</h3>
+    <picture of wiring for stepper 0>
+    <p>he wires order from left to right should be red, green, blue, yellow.</p>
+    <p>onnect the 5.1x2.2 female power supply to the RUMBA</p>
+  <h3>Test one</h3>
+		<p>connect the 12v2a power supply to the RUMBA.</p>
+		<p>install test_steppers_rumba.ino.  Motors will begin to move as soon as sketch uploads.</p>
+		<p>open the serial window to see what the code is doing.</p>
+		<p>when the test works, remove the stepper from the Arduino.</p>
+		<p>disconnect 12v power and USB.</p>
+	<h3>Install</h3>
 		<picture of tape with writing>
-		put a piece of tape on each stepper and at the far end of the wire.
-		write the stepper number on the appropriate tape.
+		<p>put a piece of tape on each stepper and at the far end of the wire.</p>
+		<p>write the stepper number on the appropriate tape.</p>
 		<picture of steppers installed>
-		install the steppers in a clockwise order.
-			Steppers 1 and 2 should be side-by-side.
-			Stepper 1 should be above switch 1.
-			Stepper 2 should be above switch 2.
-			Repeat for steppers 3-6.
-		put the wires through the hole in the center of the frame.
-		attach the steppers in order with M3x5 screws.
-			The tape will make it easy to keep them organized.
-	<h3>test </h3>
-		Make sure 12v power is not connected.
-		put a small piece of tape on each motor shaft so you can easily see it move.
-		install firmware_rumba_minimal.ino
-		open the serial window.
-			G00 X100; should turn stepper 1.
-			G00 Y100; should turn stepper 2 *in the opposite direction*.
-			G00 Z100; should turn stepper 3 same direction as #1.
-			G00 U100; should turn stepper 4 same direction as #2.
-			G00 V100; should turn stepper 5 same direction as #1.
-			G00 W100; should turn stepper 6 same direction as #2.
-     
+		<p>install the steppers in a clockwise order.</p>
+    <p>Steppers 1 and 2 should be side-by-side.</p>
+    <p>Stepper 1 should be above switch 1.</p>
+    <p>Stepper 2 should be above switch 2.</p>
+    <p>Repeat for steppers 3-6.</p>
+		<p>put the wires through the hole in the center of the frame.</p>
+		<p>attach the steppers in order with M3x5 screws.</p>
+		<p>The tape will make it easy to keep them organized.</p>
+	<h3>Test</h3>
+		<p>Make sure 12v power is not connected.</p>
+		<p>put a small piece of tape on each motor shaft so you can easily see it move.</p>
+		<p>connect the 12v2a power supply to the RUMBA.</p>
+		<p>install firmware_rumba_minimal.ino</p>
+    <p>open the serial window and set the baud rate to 57600.</p>
+    <p>G00 X100; should turn stepper 1.</p>
+    <p>G00 Y100; should turn stepper 2 *in the opposite direction*.</p>
+    <p>G00 Z100; should turn stepper 3 same direction as #1.</p>
+    <p>G00 U100; should turn stepper 4 same direction as #2.</p>
+    <p>G00 V100; should turn stepper 5 same direction as #1.</p>
+    <p>G00 W100; should turn stepper 6 same direction as #2.</p>
+    <p>G28; will spin every motor until the matching limit switch is hit.  Test all six.</p>
 
-<p><a href='arms.html'>Next &raquo;</a></p>
+<p><a href='switches.html>'>&laquo; Prev</a> | <a href='arms.html'>Next &raquo;</a></p>
 
 </body>
 </html>

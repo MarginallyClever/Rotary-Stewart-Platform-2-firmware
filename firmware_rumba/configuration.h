@@ -20,7 +20,7 @@
 #define MAX_BUF              (64)  // What is the longest message we can store?
 
 #define STEPS_PER_TURN       (400)  // depends on your stepper motor.  most are 200.
-#define MIN_STEP_DELAY       (150)  // depends on electronics
+#define MIN_STEP_DELAY       (100)  // depends on electronics
 
 #define MICROSTEPS           (16.0)
 

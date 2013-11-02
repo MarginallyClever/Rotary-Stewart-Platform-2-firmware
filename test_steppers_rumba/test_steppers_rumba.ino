@@ -6,8 +6,9 @@
 // please see http://www.github.com/MarginallyClever/RotaryStewartPlatform2 for more information.
 
 
-#define BAUD    57600
-#define MAX_BUF 64
+#define BAUD            (57600)
+#define MAX_BUF         (64)
+#define MIN_STEP_DELAY  (100)
 
 
 struct Arm {
@@ -100,7 +101,7 @@ void move_motor(int i) {
   for(j=0;j<16*400;++j) {
     digitalWrite(arms[i].motor_step_pin,HIGH);
     digitalWrite(arms[i].motor_step_pin,LOW);
-    delayMicroseconds(50);
+    delayMicroseconds(MIN_STEP_DELAY);
   }
 
   Serial.print("Testing backward ");
@@ -110,7 +111,7 @@ void move_motor(int i) {
   for(j=0;j<16*400;++j) {
     digitalWrite(arms[i].motor_step_pin,HIGH);
     digitalWrite(arms[i].motor_step_pin,LOW);
-    delayMicroseconds(50);
+    delayMicroseconds(MIN_STEP_DELAY);
   }
 }
 
