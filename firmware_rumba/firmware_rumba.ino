@@ -19,8 +19,7 @@
 // GLOBALS
 //------------------------------------------------------------------------------
 // speeds
-float fr=0;  // human version
-long step_delay;  // machine version
+float feed_rate=0;  // human version
 
 // settings
 char mode_abs=1;  // absolute mode?
@@ -47,8 +46,8 @@ void pause(long us) {
  * Set the feedrate (speed motors will move)
  * @input nfr the new speed in steps/second
  */
-void feedrate(float nfr) {
-  if(fr==nfr) return;  // same as last time?  quit now.
+float feedrate(float nfr) {
+  if(feed_rate==nfr) return nfr;  // same as last time?  quit now.
 
   if(nfr>MAX_FEEDRATE) {
     Serial.print(F("Feedrate set to maximum ("));
@@ -62,8 +61,9 @@ void feedrate(float nfr) {
     Serial.println(F("steps/s)"));
     nfr=MIN_FEEDRATE;
   }
-  step_delay = 1000000.0/nfr;
-  fr=nfr;
+  feed_rate=nfr;
+  
+  return feed_rate;
 }
 
 
@@ -78,15 +78,6 @@ void motor_position(int n0,int n1,int n2,int n3,int n4,int n5) {
   h.arms[3].last_step=n3;
   h.arms[4].last_step=n4;
   h.arms[5].last_step=n5;
-  
-  // @TODO: not sure this is right...
-  Segment &seg = line_segments[last_segment];
-  seg.a[0].step_count=n0;
-  seg.a[1].step_count=n1;
-  seg.a[2].step_count=n2;
-  seg.a[3].step_count=n3;
-  seg.a[4].step_count=n4;
-  seg.a[5].step_count=n5;
 }
 
 
@@ -122,7 +113,7 @@ void hexapod_where() {
   output("U",h.ee.r);
   output("V",h.ee.p);
   output("W",h.ee.y);
-  output("F",fr);
+  output("F",feed_rate);
   Serial.println(mode_abs?"ABS":"REL");
 } 
 
@@ -156,15 +147,68 @@ void help() {
 
 
 /**
+ * Set the clock 1 timer frequency.
+ * @input desired_freq_hz the desired frequency
+ */
+void timer_set_frequency(long desired_freq_hz) {
+  // Source: https://github.com/MarginallyClever/ArduinoTimerInterrupt
+  // Different clock sources can be selected for each timer independently. 
+  // To calculate the timer frequency (for example 2Hz using timer1) you will need:
+  
+  //  CPU frequency 16Mhz for Arduino
+  //  maximum timer counter value (256 for 8bit, 65536 for 16bit timer)
+  int prescaler_index=-1;
+  int prescalers[] = {1,8,64,256,1024};
+  long counter_value;
+  do {
+    ++prescaler_index;
+    //  Divide CPU frequency through the choosen prescaler (16000000 / 256 = 62500)
+    counter_value = CLOCK_FREQ / prescalers[prescaler_index];
+    //  Divide result through the desired frequency (62500 / 2Hz = 31250)
+    counter_value /= desired_freq_hz;
+    //  Verify counter_value < maximum timer. if fail, choose bigger prescaler.
+  } while(counter_value > MAX_COUNTER && prescaler_index<4);
+  
+  if( prescaler_index>=5 ) {
+    Serial.println(F("Timer could not be set: Desired frequency out of bounds."));
+    return;
+  }
+
+  // disable global interrupts
+  noInterrupts();
+  // set entire TCCR1A register to 0
+  TCCR1A = 0;
+  // set entire TCCR1B register to 0
+  TCCR1B = 0;
+  // set the overflow clock to 0
+  TCNT1  = 0;
+  // set compare match register to desired timer count
+  OCR1A = counter_value;
+  // turn on CTC mode
+  TCCR1B |= (1 << WGM12);
+  // Set CS10, CS11, and CS12 bits for prescaler
+  TCCR1B |= ( (( prescaler_index&0x1 )   ) << CS10);
+  TCCR1B |= ( (( prescaler_index&0x2 )>>1) << CS11);
+  TCCR1B |= ( (( prescaler_index&0x4 )>>2) << CS12);
+  // enable timer compare interrupt
+  TIMSK1 |= (1 << OCIE1A);
+  // enable global interrupts
+  interrupts();
+}
+
+
+/**
  * First thing this machine does on startup.  Runs only once.
  */
 void setup() {
   Serial.begin(BAUD);  // open coms
   help();  // say hello
 
+  pinMode(13,OUTPUT);
+
   hexapod_setup();
   motor_enable();
-  feedrate(800);  // set default speed
+  feedrate(200);  // set default speed
   hexapod_position(0,0,0,0,0,0);
   motor_position(0,0,0,0,0,0);
   //hexapod_find_home();

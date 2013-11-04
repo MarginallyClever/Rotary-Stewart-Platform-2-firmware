@@ -54,13 +54,13 @@ void parser_processCommand() {
   switch(cmd) {
   case  0: // move linear
   case  1: // move linear
-    feedrate(parsenumber('F',fr));
-    hexapod_line( parsenumber('X',(mode_abs?h.ee.pos.x:0)) + (mode_abs?0:h.ee.pos.x),
-                  parsenumber('Y',(mode_abs?h.ee.pos.y:0)) + (mode_abs?0:h.ee.pos.y),
-                  parsenumber('Z',(mode_abs?h.ee.pos.z:0)) + (mode_abs?0:h.ee.pos.z),
-                  parsenumber('U',(mode_abs?h.ee.r:0)) + (mode_abs?0:h.ee.r),
-                  parsenumber('V',(mode_abs?h.ee.p:0)) + (mode_abs?0:h.ee.p),
-                  parsenumber('W',(mode_abs?h.ee.y:0)) + (mode_abs?0:h.ee.y) );
+      hexapod_line( parsenumber('X',(mode_abs?h.ee.pos.x:0)) + (mode_abs?0:h.ee.pos.x),
+                    parsenumber('Y',(mode_abs?h.ee.pos.y:0)) + (mode_abs?0:h.ee.pos.y),
+                    parsenumber('Z',(mode_abs?h.ee.pos.z:0)) + (mode_abs?0:h.ee.pos.z),
+                    parsenumber('U',(mode_abs?h.ee.r:0)) + (mode_abs?0:h.ee.r),
+                    parsenumber('V',(mode_abs?h.ee.p:0)) + (mode_abs?0:h.ee.p),
+                    parsenumber('W',(mode_abs?h.ee.y:0)) + (mode_abs?0:h.ee.y),
+                    feedrate(parsenumber('F',feed_rate)) );
     break;
   case  4:  pause(parsenumber('P',0)*1000);  break;  // dwell
   case 28:  hexapod_find_home();  break;  

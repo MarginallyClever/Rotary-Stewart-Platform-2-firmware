@@ -14,15 +14,16 @@
 //#define VERBOSE              (1)  // add to get a lot more serial output.
 //#define DEBUG_SWITCHES       (1)
 
-
 #define VERSION              (1)  // firmware version
+
 #define BAUD                 (57600)  // How fast is the Arduino talking?
 #define MAX_BUF              (64)  // What is the longest message we can store?
 
 #define STEPS_PER_TURN       (400)  // depends on your stepper motor.  most are 200.
-#define MIN_STEP_DELAY       (100)  // depends on electronics
-
 #define MICROSTEPS           (16.0)
+
+#define MAX_FEEDRATE         (240.0)  // depends on timer interrupt & hardware
+#define MIN_FEEDRATE         (0.01)
 
 // measurements based on computer model of robot
 #define BICEP_LENGTH         ( 5.000)
@@ -56,8 +57,9 @@
 #define MICROSTEP_DISTANCE   (CIRCUMFERENCE/MICROSTEPS_PER_TURN)  // distance elbow moves in a single microstep
 #define MICROSTEP_PER_DEGREE (MICROSTEPS_PER_TURN/360.0)
 
-#define MAX_FEEDRATE         (1000000/MIN_STEP_DELAY)
-#define MIN_FEEDRATE         (0.01)
+
+#define CLOCK_FREQ           (16000000L)
+#define MAX_COUNTER          (65536L)
 
 /**
 * This file is part of Stewart Platform v2.

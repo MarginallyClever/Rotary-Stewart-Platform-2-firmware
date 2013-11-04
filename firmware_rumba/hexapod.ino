@@ -323,7 +323,7 @@ void hexapod_update_shoulder_angles() {
  * @input newx the destination x position
  * @input newy the destination y position
  **/
-void hexapod_line(float newx,float newy,float newz,float newu,float newv,float neww) {
+void hexapod_line(float newx,float newy,float newz,float newu,float newv,float neww,float new_feed_rate) {
   Vector3 endpos(newx,newy,newz);
   Vector3 endrpy(newu,newv,neww);
 
@@ -351,7 +351,8 @@ void hexapod_line(float newx,float newy,float newz,float newu,float newv,float n
 #endif
 
   if(steps==0) return;
- 
+  char start_timer = (current_segment==last_segment);
+  
   float istep = 1.0/(float)steps;
 
   long i;
@@ -393,10 +394,12 @@ void hexapod_line(float newx,float newy,float newz,float newu,float newv,float n
                           h.arms[2].new_step,
                           h.arms[3].new_step,
                           h.arms[4].new_step,
-                          h.arms[5].new_step);
+                          h.arms[5].new_step,new_feed_rate);
   }
 
-  motor_move_all_segments();
+  if(start_timer==1) {
+    timer_set_frequency(new_feed_rate);
+  }
   
   // @TODO: This does not take into account movements of a fraction of a step.  They will be misreported and lead to error.
   hexapod_position(newx,newy,newz,newu,newv,neww);
@@ -411,7 +414,7 @@ void hexapod_position(float npx,float npy,float npz,float npu,float npv,float np
   h.ee.p=npv;
   h.ee.y=npw;
   // @TODO: Update the motor positions to match the new virtual position or they will go crazy on the next hexapod_line()
-  // @TODO: Until motor positions can match hexapod position G92 *will* have unintended effects.
+  // @TODO: Until motor positions can match hexapod position G92 will have unintended effects.
 }
 
 
@@ -484,7 +487,7 @@ void hexapod_find_home() {
         hexapod_onestep(i,-1);
       }
     }
-    pause(step_delay);
+    pause(100000L/feed_rate);
   }
 
   // The arms are 19.69 degrees from straight down when they hit the switch.
@@ -501,7 +504,7 @@ void hexapod_find_home() {
     for(i=0;i<6;++i) {
       hexapod_onestep(i,1);
     }
-    pause(step_delay);
+    pause(100000L/feed_rate);
   }
   hexapod_position(0,0,0,0,0,0);
   motor_position(0,0,0,0,0,0);

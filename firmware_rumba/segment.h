@@ -34,7 +34,8 @@ struct Axis {
 struct Segment {
   Axis a[NUM_AXIES];
   int steps;
-  long step_delay;
+  int steps_left;
+  long feed_rate;
 };
 
 
@@ -42,8 +43,8 @@ struct Segment {
 // GLOBALS
 //------------------------------------------------------------------------------
 extern Segment line_segments[MAX_SEGMENTS];
-extern int current_segment;
-extern int last_segment;
+extern volatile int current_segment;
+extern volatile int last_segment;
 
 
 //------------------------------------------------------------------------------
@@ -51,7 +52,7 @@ extern int last_segment;
 //------------------------------------------------------------------------------
 int get_next_segment(int i);
 int get_prev_segment(int i);
-void motor_prepare_segment(int n0,int n1,int n2,int n3,int n4,int n5);
+void motor_prepare_segment(int n0,int n1,int n2,int n3,int n4,int n5,float new_feed_rate);
 void motor_move_segment(Segment &seg);
 void motor_move_all_segments();
 

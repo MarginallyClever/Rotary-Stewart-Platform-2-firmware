@@ -13,6 +13,8 @@ margin:50px auto 50px auto;
 <p><a href='arms.html>'>&laquo; Prev</a></p>
 
 <h2>Final tests</h2>
+  <p>install firmware_rumba.ino</p>
+
   <h3>M18;</h3>
     <p>disables power to all stepper motors.</p>
     <p>You can freely move the platform.  Don't forget gravity is in effect!</p>
@@ -24,13 +26,13 @@ margin:50px auto 50px auto;
     <p>move the platform so each bicep is approximately level.</p>
     <p>M17;</p>
     <p>Be prepared to disconnect 12v power if something goes wrong.</p>
-    <p>G00 F200 Z1; should move the platform up one centimeter.</p>
+    <p>G00 F50 Z1; should move the platform up one centimeter.</p>
   <h3>test homing</h3>
     <p>G28;
     <p>Steppers should immediately move "down" to touch switches and then move to home position.</p>
-    <p>Because of the previous F200 they will move slowly.</p>
+    <p>Because of the previous F50 they will move more slowly now.  G28 obeys the feed rate.</p>
   <h3>test full speed</h3>
-    <p>G00 F800; changes speed without moving.</p>
+    <p>G00 F200; changes speed without moving.</p>
     <p>G00 X1.5; should move 15mm sideways.</p>
     <p>G00 Y1.5; should move 15mm orthogonal to X and Z.</p>
     <p>G00 U10; tilt 10 degrees around Y.</p>

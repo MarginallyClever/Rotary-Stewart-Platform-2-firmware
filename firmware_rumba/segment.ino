@@ -20,8 +20,8 @@
 // @TODO: process the line segments in another thread
 // @TODO: optimize speed between line segments
 Segment line_segments[MAX_SEGMENTS];
-int current_segment=0;
-int last_segment=0;
+volatile int current_segment=0;
+volatile int last_segment=0;
 
 
 //------------------------------------------------------------------------------
@@ -40,16 +40,14 @@ int get_prev_segment(int i) {
 /**
  * Add a segment to the line buffer if there is room.
  */
-void motor_prepare_segment(int n0,int n1,int n2,int n3,int n4,int n5) {
+void motor_prepare_segment(int n0,int n1,int n2,int n3,int n4,int n5,float new_feed_rate) {
   int next_segment = get_next_segment(last_segment);
-  if( next_segment == current_segment ) {
-    Serial.println(F("Segment buffer overflow."));
-    return;
+  while( next_segment == current_segment ) {
+    // the buffer is full, we are way ahead of the motion system
+    delay(1);
   }
-  
-  Segment &old_seg = line_segments[last_segment];
-  Segment &new_seg = line_segments[next_segment];
-  
+
+  Segment &new_seg = line_segments[last_segment];
   new_seg.a[0].step_count = n0;
   new_seg.a[1].step_count = n1;
   new_seg.a[2].step_count = n2;
@@ -57,6 +55,9 @@ void motor_prepare_segment(int n0,int n1,int n2,int n3,int n4,int n5) {
   new_seg.a[4].step_count = n4;
   new_seg.a[5].step_count = n5;
   
+  int i;
+
+  Segment &old_seg = line_segments[get_prev_segment(last_segment)];
   new_seg.a[0].delta = n0 - old_seg.a[0].step_count;
   new_seg.a[1].delta = n1 - old_seg.a[1].step_count;
   new_seg.a[2].delta = n2 - old_seg.a[2].step_count;
@@ -65,9 +66,8 @@ void motor_prepare_segment(int n0,int n1,int n2,int n3,int n4,int n5) {
   new_seg.a[5].delta = n5 - old_seg.a[5].step_count;
 
   new_seg.steps=0;
-  new_seg.step_delay=step_delay;
+  new_seg.feed_rate=new_feed_rate;
 
-  int i,j;
   for(i=0;i<NUM_AXIES;++i) {
     new_seg.a[i].over = 0;
     new_seg.a[i].dir = (new_seg.a[i].delta * h.arms[i].motor_scale > 0 ? LOW:HIGH);
@@ -77,47 +77,61 @@ void motor_prepare_segment(int n0,int n1,int n2,int n3,int n4,int n5) {
     }
   }
 
+  if( new_seg.steps==0 ) return;
+
+  new_seg.steps_left = new_seg.steps;
+  
 #ifdef VERBOSE
-  Serial.print(F("Added segment "));
-  Serial.println(last_segment);
+  Serial.print(F("At "));  Serial.println(current_segment);
+  Serial.print(F("Adding "));  Serial.println(last_segment);
+  Serial.print(F("Steps= "));  Serial.println(new_seg.steps_left);
 #endif
-  last_segment=get_next_segment(last_segment);
+  last_segment = next_segment;
 }
 
  
 /**
  * Process all line segments in the ring buffer.  Uses bresenham's line algorithm to move all motors.
  */
-void motor_move_all_segments() {
-  int i,j,s;
+ISR(TIMER1_COMPA_vect) {
+   digitalWrite(13,digitalRead(13)^1);
+  // segment buffer empty? do nothing
+  if( current_segment == last_segment ) return;
   
-  while(current_segment!=last_segment) {
+  // Is this segment done?
+  if( line_segments[current_segment].steps_left <= 0 ) {
+    // Move on to next segment without wasting an interrupt tick.
     current_segment = get_next_segment(current_segment);
-    Segment &seg = line_segments[current_segment];
-    
-    // set the directions once per segment
+    if( current_segment == last_segment ) return;
+  }
+  
+  int j;
+  Segment &seg = line_segments[current_segment];
+  // is this a fresh new segment?
+  if( seg.steps == seg.steps_left ) {
+    // set the direction pins
     for(j=0;j<NUM_AXIES;++j) {
-      digitalWrite( h.arms[j].motor_dir_pin, seg.a[j].dir );
+      digitalWrite( h.arms[j].motor_dir_pin, line_segments[current_segment].a[j].dir );
     }
+    // set frequency to segment feed rate
+    timer_set_frequency(seg.feed_rate);
+  }
+
+  // make a step
+  --seg.steps_left;
+
+  // move each axis
+  for(j=0;j<NUM_AXIES;++j) {
+    Axis &a = seg.a[j];
     
-    s=seg.steps;
-    
-    for(i=0;i<s;++i) {
-      for(j=0;j<NUM_AXIES;++j) {
-        Axis &a = seg.a[j];
-        
-        a.over += a.absdelta;
-        if(a.over >= s) {
-          a.over -= s;
-          digitalWrite(h.arms[j].motor_step_pin,LOW);
-          digitalWrite(h.arms[j].motor_step_pin,HIGH);
-        }
-      }
-      pause(seg.step_delay);
+    a.over += a.absdelta;
+    if(a.over >= seg.steps) {
+      digitalWrite(h.arms[j].motor_step_pin,LOW);
+      a.over -= seg.steps;
+      digitalWrite(h.arms[j].motor_step_pin,HIGH);
     }
   }
 }
-
 
 
 /**

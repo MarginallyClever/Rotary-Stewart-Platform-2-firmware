@@ -68,6 +68,8 @@ extern Hexapod h;
 //------------------------------------------------------------------------------
 void hexapod_setup();
 void hexapod_update_ik(Vector3 &mov,Vector3 &rpy);
+void hexapod_line(float newx,float newy,float newz,float newu,float newv,float neww,float new_feed_rate);
+
 
 /**
 * This file is part of Stewart Platform v2.
