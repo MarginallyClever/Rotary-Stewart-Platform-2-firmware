@@ -86,6 +86,11 @@ void motor_prepare_segment(int n0,int n1,int n2,int n3,int n4,int n5,float new_f
   Serial.print(F("Adding "));  Serial.println(last_segment);
   Serial.print(F("Steps= "));  Serial.println(new_seg.steps_left);
 #endif
+
+  if( current_segment==last_segment ) {
+    timer_set_frequency(new_feed_rate);
+  }
+  
   last_segment = next_segment;
 }
 
