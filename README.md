@@ -23,10 +23,6 @@ RUMBA Controller:
 Windows driver: http://reprap.org/wiki/File:RRD_RUMBA_TAURINO_DriverSetup.zip
 more info: http://reprap.org/wiki/RUMBA
 
-##History
-
-2013-09-20: updated BOM for RUMBA control board
-
 ##More
 
 This code is online @ http://www.github.com/MarginallyClever/RotaryStewartPlatform2

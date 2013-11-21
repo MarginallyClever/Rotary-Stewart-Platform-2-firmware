@@ -1,12 +1,8 @@
 <!DOCTYPE html>
 <html>
-<head><title>Stewart Platform Assembly</title></head>
-<style type='text/css'>
-body {
-width:900px;
-margin:50px auto 50px auto;
-}
-</style>
+<head><title>Stewart Platform Assembly</title>
+<link rel="stylesheet" type="text/css" href="screen.css" media='screen,print'>
+</head>
 <body>
 
 <p><a href='ASSEMBLY.html>'>Index</a></p>
@@ -24,14 +20,26 @@ margin:50px auto 50px auto;
 		<img src='26.JPG' width='900'>
 		<p>move the jumper on the RUMBA from "Stand alone" to "USB power".</p>
 
-  <h3>Test</h3>
+  <h3>Upload &amp; Run your first Arduino Test program</h3>
     <p>connect the RUMBA controller to your computer with the USB cable provided.</p>
     <img src='24.JPG' width='900'>
     <p>connect the switch to an input.</p>
-    <p>install test_switches.ino</p>
-    <p>open the serial window and set the baud rate to 57600.</p>
-    <p>press the switch.  A column should change from 1 to 0.</p>
-    <p>disconnect USB.</p>
+    <p>Start Arduino software.</p>
+    <p>Change Arduino &gt; Tools &gt; Board to "Arduino Mega 2560 or Mega ADK".</p>
+    <p>Change Arduino &gt; Tools &gt; Serial Port.</p>
+    <ul>
+    <li>Windows: Probably the last COM port listed.
+    <li>OSX/linux: Something similar to /dev/tty.usbmodemfa131.
+    </ul>
+    <p>In Arduino software open test_switches.ino</p>
+    <p>In Arduino software click the "upload" button.</p>
+    <p>
+    <p>In Arduino software open the <em>Serial Monitor</em> window (magnifying glass icon on the top right).  You should see garbage characters in the window.</p>
+    <p>In the Serial Monitor window set the baud rate to 57600 (bottom right corner).  You should now see six columns of '1's.</p>
+    <p>Press the switch.  A single column should change from 1 to 0.  If it doesn't, recheck your connections between the switch and the RUMBA.</p>
+    <p>Close the serial window.</p>
+    <p class='note'><strong>Go out the way you came in</strong><br>Make this a habit!  If you disconnect USB while the serial window is open in Windows you will have to reboot your PC before windows can "find" the COM port again.</p>
+    <p>Disconnect USB.</p>
 
   <h3>Install</h3>
     <p>Thread the wire for two switches through the hole in each face.  secure the switches with zip ties so that the roller is downward.</p>
@@ -41,9 +49,9 @@ margin:50px auto 50px auto;
     <p>Switches 5 and 6 should be side-by-side with switch 5 on the right.</p>
 
   <h3>Test 2</h3>
-    <p>connect the RUMBA controller to your computer with the USB cable provided.</p>
-    <p>test the switches again to be sure they are in the correct order.</p>
-    <p>disconnect USB.</p>
+    <p>Connect the RUMBA controller to your computer with the USB cable provided.</p>
+    <p>Test the switches again to be sure they are in the correct order.</p>
+    <p>Disconnect USB.</p>
 
 <p><a href='glueing.html>'>&laquo; Prev</a> | <a href='steppers.html'>Next &raquo;</a></p>
 </body>

@@ -1,0 +1,18 @@
+html {
+margin:0px;
+padding:0px;
+}
+
+body {
+width:900px;
+margin:50px auto 50px auto;
+background-color:#efefef;
+}
+
+.note {
+margin:20px 0px;
+padding:10px;
+background-color:#ffffbb;
+border-radius:10px;
+border:1px solid #ffff66;
+}

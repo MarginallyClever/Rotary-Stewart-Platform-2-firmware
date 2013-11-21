@@ -1,28 +1,26 @@
 <!DOCTYPE html>
 <html>
-<head><title>Stewart Platform Assembly</title></head>
-<style type='text/css'>
-body {
-	width:900px;
-	margin:50px auto 50px auto;
-}
-</style>
+<head><title>Stewart Platform Assembly</title>
+<link rel="stylesheet" type="text/css" href="screen.css" media='screen,print'>
+</head>
 <body>
 
 <p><a href='ASSEMBLY.html>'>Index</a></p>
 <p><a href='switches.html>'>&laquo; Prev</a> | <a href='arms.html'>Next &raquo;</a></p>
 
 <h2>The stepper motors</h2>
-	<h3>Attach</h3>
+	<h3>Attach &amp; test one motor</h3>
     <picture of wiring for stepper 0>
-    <p>he wires order from left to right should be red, green, blue, yellow.</p>
-    <p>onnect the 5.1x2.2 female power supply to the RUMBA</p>
-  <h3>Test one</h3>
-		<p>connect the 12v2a power supply to the RUMBA.</p>
-		<p>install test_steppers_rumba.ino.  Motors will begin to move as soon as sketch uploads.</p>
-		<p>open the serial window to see what the code is doing.</p>
-		<p>when the test works, remove the stepper from the Arduino.</p>
-		<p>disconnect 12v power and USB.</p>
+    <p>The wires order from left to right should be red, green, blue, yellow.</p>
+    <p class='note'><strong>If you are using the motor extension cables provided with the kit</strong><br>
+    The word "MOTOR" on the connector should face the Polulu chip.  You should solder the extension blue, red, 
+    green, and black to the stepper motor red, green, blue, and yellow, respectively.</p>
+    <p>Connect the 5.1x2.2 female power supply to the RUMBA screw terminals labelled MAIN-PWR</p>
+		<p>Connect the 12v2a power supply to the RUMBA.</p>
+		<p>Install test_steppers_rumba.ino.  Motors will begin to move as soon as sketch uploads.</p>
+		<p>Open the serial window to see what the code is doing.</p>
+		<p>When the test works, disconnect the stepper from the RUMBA.</p>
+		<p>Close the serial window, disconnect 12v power, and disconnect USB.</p>
 	<h3>Install</h3>
 		<picture of tape with writing>
 		<p>put a piece of tape on each stepper and at the far end of the wire.</p>
