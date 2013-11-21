@@ -351,7 +351,6 @@ void hexapod_line(float newx,float newy,float newz,float newu,float newv,float n
 #endif
 
   if(steps==0) return;
-  char start_timer = (current_segment==last_segment);
   
   float istep = 1.0/(float)steps;
 
@@ -395,10 +394,6 @@ void hexapod_line(float newx,float newy,float newz,float newu,float newv,float n
                           h.arms[3].new_step,
                           h.arms[4].new_step,
                           h.arms[5].new_step,new_feed_rate);
-  }
-
-  if(start_timer==1) {
-    timer_set_frequency(new_feed_rate);
   }
   
   // @TODO: This does not take into account movements of a fraction of a step.  They will be misreported and lead to error.
