@@ -2,6 +2,12 @@
 
 a 6-axis motion control platform for scientists, students, and enthusiasts.
 
+##Assembly
+
+Our helpful website has all the explanation and pictures to guide you along.
+
+http://learn.marginallyclever.com/index.php/Stewart_Platform_2
+
 ##Note
 
 The initial commit is a gcode interpreter that will move motors according to bresenham's line algorithm.
