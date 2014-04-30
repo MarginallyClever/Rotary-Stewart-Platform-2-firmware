@@ -282,7 +282,7 @@ void help() {
   Serial.println(F("M17/M18; - enable/disable motors"));
   Serial.println(F("M100; - this help message"));
   Serial.println(F("M114; - report position and feedrate"));
-  Serial.println(F("F, G00, G01, G04, G28, G90, G91, G92 as described by http://en.wikipedia.org/wiki/G-code"));
+  Serial.println(F("F, G00, G01, G04, G17, G18, G28, G90, G91, G92 as described by http://en.wikipedia.org/wiki/G-code"));
 }
 
 
@@ -378,7 +378,7 @@ void setup_switches() {
   arms[4].limit_switch_pin=33;
   arms[5].limit_switch_pin=32;
   
-  for(int i=0;i<6;++i) {  
+  for(int i=0;i<NUM_AXIES;++i) {  
     // set the switch pin
     arms[i].limit_switch_state=HIGH;
     pinMode(arms[i].limit_switch_pin,INPUT);
@@ -393,17 +393,18 @@ void setup_switches() {
 void find_home() {
   char i;
   // until all switches are hit
-  while(read_switches()<6) {
+  while(read_switches()<NUM_AXIES) {
 #ifdef VERBOSE
   Serial.println(read_switches(),DEC);
 #endif
     // for each stepper,
-    for(i=0;i<6;++i) {
+    for(i=0;i<NUM_AXIES;++i) {
       // if this switch hasn't been hit yet
       if(arms[i].limit_switch_state == HIGH) {
         // move "down"
         onestep(i,-1);
       }
+        delay(10);
     }
   }
 
@@ -417,9 +418,10 @@ void find_home() {
 #endif
 
   for(;steps_to_zero>0;--steps_to_zero) {
-    for(i=0;i<6;++i) {
+    for(i=0;i<NUM_AXIES;++i) {
       onestep(i,1);
     }
+        delay(10);
   }
   position(0,0,0,0,0,0);
 }

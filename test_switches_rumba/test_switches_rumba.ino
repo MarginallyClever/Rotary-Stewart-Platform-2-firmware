@@ -6,12 +6,15 @@
 // please see http://www.github.com/MarginallyClever/RotaryStewartPlatform2 for more information.
 
 
-int old_state[6];
+#define NUM_SWITCHES  (6)
+
+int old_state[NUM_SWITCHES];
 
 
 void setup() {
   Serial.begin(57600);
-  for(int i=0;i<6;++i) {
+  Serial.println(F("Switch test"));
+  for(int i=0;i<NUM_SWITCHES;++i) {
     int j=37-i;
     pinMode(j,INPUT);
     digitalWrite(j,HIGH);
@@ -21,7 +24,7 @@ void setup() {
 
 
 void loop() {
-  for(int i=0;i<6;++i) {
+  for(int i=0;i<NUM_SWITCHES;++i) {
     int j=37-i;
     int state=digitalRead(j);
     if(old_state[i] != state) {

@@ -22,10 +22,11 @@
 #define STEPS_PER_TURN       (400)  // depends on your stepper motor.  most are 200.
 #define MICROSTEPS           (16.0)
 
-#define MAX_FEEDRATE         (240.0)  // depends on timer interrupt & hardware
+#define MAX_FEEDRATE         (16000.0)  // depends on timer interrupt & hardware
 #define MIN_FEEDRATE         (0.01)
 
 // measurements based on computer model of robot
+#define NUM_AXIES            (6)
 #define BICEP_LENGTH         ( 5.000)
 #define FOREARM_LENGTH       (16.750)
 #define SWITCH_ANGLE         (19.690)
@@ -37,17 +38,26 @@
 #define B2S_X                ( 8.093)
 #define B2S_Y                ( 2.150)
 #define B2S_Z                ( 6.618)
+// hardware/software pins
+#define MOTOR_0_DIR_PIN  (16)
+#define MOTOR_0_STEP_PIN (17)
+#define MOTOR_1_DIR_PIN  (47)
+#define MOTOR_1_STEP_PIN (54)
+#define MOTOR_2_DIR_PIN  (56)
+#define MOTOR_2_STEP_PIN (57)
+#define MOTOR_3_DIR_PIN  (22)
+#define MOTOR_3_STEP_PIN (23)
+#define MOTOR_4_DIR_PIN  (25)
+#define MOTOR_4_STEP_PIN (26)
+#define MOTOR_5_DIR_PIN  (28)
+#define MOTOR_5_STEP_PIN (29)
 
+// for splitting lines and look-ahead
 #define STEPS_PER_CM         (10)
 #define STEPS_PER_DEG        (5)
-
-
-// ** Nothing below this line needs to be configured **
-
+#define MAX_SEGMENTS         (64)  // must be a power of 2
 
 // convenience macros
-#define NUM_AXIES            (6)
-
 #define TWOPI                (PI*2.0)
 #define DEG2RAD              (PI/180.0)
 #define RAD2DEG              (180.0/PI)
@@ -57,9 +67,18 @@
 #define MICROSTEP_DISTANCE   (CIRCUMFERENCE/MICROSTEPS_PER_TURN)  // distance elbow moves in a single microstep
 #define MICROSTEP_PER_DEGREE (MICROSTEPS_PER_TURN/360.0)
 
-
+// timing
 #define CLOCK_FREQ           (16000000L)
 #define MAX_COUNTER          (65536L)
+
+
+// optimize code, please
+#define FORCE_INLINE         __attribute__((always_inline)) inline
+
+#ifndef NULL
+#define NULL 0
+#endif
+
 
 /**
 * This file is part of Stewart Platform v2.

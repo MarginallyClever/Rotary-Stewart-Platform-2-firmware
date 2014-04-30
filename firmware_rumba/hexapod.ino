@@ -466,7 +466,7 @@ void hexapod_onestep(int motor,int dir) {
 void hexapod_find_home() {
   Serial.println(F("Finding min..."));
 
-  motor_enable();
+  //motor_enable();
   
   char i;
   // until all switches are hit
@@ -482,7 +482,7 @@ void hexapod_find_home() {
         hexapod_onestep(i,-1);
       }
     }
-    pause(100000L/feed_rate);
+    pause(150);
   }
 
   // The arms are 19.69 degrees from straight down when they hit the switch.
@@ -499,7 +499,7 @@ void hexapod_find_home() {
     for(i=0;i<6;++i) {
       hexapod_onestep(i,1);
     }
-    pause(100000L/feed_rate);
+    pause(150);
   }
   hexapod_position(0,0,0,0,0,0);
   motor_position(0,0,0,0,0,0);

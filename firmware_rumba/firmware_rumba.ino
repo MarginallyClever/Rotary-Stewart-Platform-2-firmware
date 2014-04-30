@@ -147,57 +147,6 @@ void help() {
 
 
 /**
- * Set the clock 1 timer frequency.
- * @input desired_freq_hz the desired frequency
- */
-void timer_set_frequency(long desired_freq_hz) {
-  // Source: https://github.com/MarginallyClever/ArduinoTimerInterrupt
-  // Different clock sources can be selected for each timer independently. 
-  // To calculate the timer frequency (for example 2Hz using timer1) you will need:
-  
-  //  CPU frequency 16Mhz for Arduino
-  //  maximum timer counter value (256 for 8bit, 65536 for 16bit timer)
-  int prescaler_index=-1;
-  int prescalers[] = {1,8,64,256,1024};
-  long counter_value;
-  do {
-    ++prescaler_index;
-    //  Divide CPU frequency through the choosen prescaler (16000000 / 256 = 62500)
-    counter_value = CLOCK_FREQ / prescalers[prescaler_index];
-    //  Divide result through the desired frequency (62500 / 2Hz = 31250)
-    counter_value /= desired_freq_hz;
-    //  Verify counter_value < maximum timer. if fail, choose bigger prescaler.
-  } while(counter_value > MAX_COUNTER && prescaler_index<4);
-  
-  if( prescaler_index>=5 ) {
-    Serial.println(F("Timer could not be set: Desired frequency out of bounds."));
-    return;
-  }
-
-  // disable global interrupts
-  noInterrupts();
-  // set entire TCCR1A register to 0
-  TCCR1A = 0;
-  // set entire TCCR1B register to 0
-  TCCR1B = 0;
-  // set the overflow clock to 0
-  TCNT1  = 0;
-  // set compare match register to desired timer count
-  OCR1A = counter_value;
-  // turn on CTC mode
-  TCCR1B |= (1 << WGM12);
-  // Set CS10, CS11, and CS12 bits for prescaler
-  TCCR1B |= ( (( prescaler_index&0x1 )   ) << CS10);
-  TCCR1B |= ( (( prescaler_index&0x2 )>>1) << CS11);
-  TCCR1B |= ( (( prescaler_index&0x4 )>>2) << CS12);
-  // enable timer compare interrupt
-  TIMSK1 |= (1 << OCIE1A);
-  // enable global interrupts
-  interrupts();
-}
-
-
-/**
  * First thing this machine does on startup.  Runs only once.
  */
 void setup() {

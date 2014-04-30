@@ -8,12 +8,6 @@
 // please see http://www.github.com/MarginallyClever/RotaryStewartPlatform2 for more information.
 
 
-//------------------------------------------------------------------------------
-// CONSTANTS
-//------------------------------------------------------------------------------
-
-
-#define MAX_SEGMENTS         (64)
 
 
 //------------------------------------------------------------------------------
@@ -24,27 +18,33 @@
 // 32 microstepping with 400 steps per turn cannot exceed 12800.  A signed int is 32767.
 struct Axis {
   int step_count;
-  int delta;
   int absdelta;
+  int delta;
   int dir;
-  int over;
 };
 
 
 struct Segment {
   Axis a[NUM_AXIES];
-  int steps;
-  int steps_left;
-  long feed_rate;
+  int steps_total;
+  int steps_taken;
+  int accel_until;
+  int decel_after;
+  long feed_rate_start;
+  long feed_rate_nominal;
+  long feed_rate_end;
 };
+
 
 
 //------------------------------------------------------------------------------
 // GLOBALS
 //------------------------------------------------------------------------------
 extern Segment line_segments[MAX_SEGMENTS];
+extern Segment *working_seg;
 extern volatile int current_segment;
-extern volatile int last_segment;
+extern volatile int last_segment   ;
+
 
 
 //------------------------------------------------------------------------------
@@ -55,6 +55,17 @@ int get_prev_segment(int i);
 void motor_prepare_segment(int n0,int n1,int n2,int n3,int n4,int n5,float new_feed_rate);
 void motor_move_segment(Segment &seg);
 void motor_move_all_segments();
+
+
+
+// for reasons I don't understand... if i put this method in the .ino file i get compile errors.
+// so I put it here, which forces the externs.
+FORCE_INLINE Segment *segment_get_working() {
+  if(current_segment == last_segment ) return NULL;
+  working_seg = &line_segments[current_segment];
+  return working_seg;
+}
+
 
 
 /**
