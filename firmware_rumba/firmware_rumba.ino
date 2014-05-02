@@ -118,7 +118,7 @@ void motor_disable() {
  * print the current position, feedrate, and absolute mode.
  */
 void hexapod_where() {
-  Vector3 offset = hexapod_get_end_plus_offset;
+  Vector3 offset = hexapod_get_end_plus_offset();
   output("X",offset.x);
   output("Y",offset.y);
   output("Z",offset.z);

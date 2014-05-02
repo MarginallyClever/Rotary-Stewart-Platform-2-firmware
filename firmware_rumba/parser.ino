@@ -76,7 +76,11 @@ void parser_processCommand() {
                 feedrate(parsenumber('F',feed_rate)) );
     break;
   }
-  case  4:  pause(parsenumber('P',0)*1000);  break;  // dwell
+  case  4:  {  // dwell
+    synchronize();
+    pause(parsenumber('P',0)*1000);
+    break;
+  }
   case 28:  hexapod_find_home();  break;
   case 54:
   case 55:
@@ -142,8 +146,19 @@ void parser_listen() {
     buffer[sofar]=0;  // end the buffer so string functions work right
     Serial.print(F("\r\n"));  // echo a return character for humans
     parser_processCommand();  // do something with the command
+    
+#ifdef ONE_COMMAND_AT_A_TIME
+    synchronize();
+#endif
+
     parser_ready();
   }
+}
+
+
+// force this thread to do nothing until all the queued segments are processed.
+void synchronize() {
+  while( current_segment != last_segment );
 }
 
 
