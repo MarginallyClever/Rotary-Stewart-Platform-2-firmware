@@ -33,6 +33,17 @@ char *letter="UVWXYZ";
 // METHODS
 //------------------------------------------------------------------------------
 /**
+  * finds angle of dy/dx as a value from 0...2PI
+  * @return the angle
+  */
+float atan3(float dy,float dx) {
+  float a=atan2(dy,dx);
+  if(a<0) a=(PI*2.0)+a;
+  return a;
+}
+
+
+/**
  * Delay for the appropriate time. delayMicroseconds() doesn't work for ms values > ~16k.
  * @input us how many microseconds to wait
  */
@@ -107,9 +118,10 @@ void motor_disable() {
  * print the current position, feedrate, and absolute mode.
  */
 void hexapod_where() {
-  output("X",h.ee.pos.x);
-  output("Y",h.ee.pos.y);
-  output("Z",h.ee.pos.z);
+  Vector3 offset = hexapod_get_end_plus_offset;
+  output("X",offset.x);
+  output("Y",offset.y);
+  output("Z",offset.z);
   output("U",h.ee.r);
   output("V",h.ee.p);
   output("W",h.ee.y);

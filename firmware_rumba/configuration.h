@@ -27,6 +27,7 @@
 
 // measurements based on computer model of robot
 #define NUM_AXIES            (6)
+#define NUM_TOOLS            (6)
 #define BICEP_LENGTH         ( 5.000)
 #define FOREARM_LENGTH       (16.750)
 #define SWITCH_ANGLE         (19.690)
@@ -53,8 +54,8 @@
 #define MOTOR_5_STEP_PIN (29)
 
 // for splitting lines and look-ahead
-#define STEPS_PER_CM         (10)
-#define STEPS_PER_DEG        (5)
+#define SEGMENTS_PER_CM      (10)
+#define SEGMENTS_PER_DEG     (5)
 #define MAX_SEGMENTS         (64)  // must be a power of 2
 
 // convenience macros

@@ -48,10 +48,12 @@ struct Arm {
 
 
 struct Hexapod {
-  Vector3 base;
   Arm arms[NUM_AXIES];
   EndEffector ee;
- 
+  Vector3 base;
+  Vector3 tool_offset[NUM_TOOLS];
+  int current_tool;
+  
   Vector3 v;  // max XYZ vel
   Vector3 destination;  // target XYZ position
 };

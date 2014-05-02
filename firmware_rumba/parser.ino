@@ -53,17 +53,43 @@ void parser_processCommand() {
   int cmd = parsenumber('G',-1);
   switch(cmd) {
   case  0: // move linear
-  case  1: // move linear
-      hexapod_line( parsenumber('X',(mode_abs?h.ee.pos.x:0)) + (mode_abs?0:h.ee.pos.x),
-                    parsenumber('Y',(mode_abs?h.ee.pos.y:0)) + (mode_abs?0:h.ee.pos.y),
-                    parsenumber('Z',(mode_abs?h.ee.pos.z:0)) + (mode_abs?0:h.ee.pos.z),
+  case  1: { // move linear
+      Vector3 offset=hexapod_get_end_plus_offset();
+      hexapod_line( parsenumber('X',(mode_abs?offset.x:0)) + (mode_abs?0:offset.x),
+                    parsenumber('Y',(mode_abs?offset.y:0)) + (mode_abs?0:offset.y),
+                    parsenumber('Z',(mode_abs?offset.z:0)) + (mode_abs?0:offset.z),
                     parsenumber('U',(mode_abs?h.ee.r:0)) + (mode_abs?0:h.ee.r),
                     parsenumber('V',(mode_abs?h.ee.p:0)) + (mode_abs?0:h.ee.p),
                     parsenumber('W',(mode_abs?h.ee.y:0)) + (mode_abs?0:h.ee.y),
                     feedrate(parsenumber('F',feed_rate)) );
     break;
+  }
+  case 2:
+  case 3: { // move in an arc
+    Vector3 offset=hexapod_get_end_plus_offset();
+    hexapod_arc(parsenumber('I',(mode_abs?offset.x:0)) + (mode_abs?0:offset.x),
+                parsenumber('J',(mode_abs?offset.y:0)) + (mode_abs?0:offset.y),
+                parsenumber('X',(mode_abs?offset.x:0)) + (mode_abs?0:offset.x),
+                parsenumber('Y',(mode_abs?offset.y:0)) + (mode_abs?0:offset.y),
+                parsenumber('Z',(mode_abs?offset.z:0)) + (mode_abs?0:offset.z),
+                (cmd==2) ? -1 : 1,
+                feedrate(parsenumber('F',feed_rate)) );
+    break;
+  }
   case  4:  pause(parsenumber('P',0)*1000);  break;  // dwell
-  case 28:  hexapod_find_home();  break;  
+  case 28:  hexapod_find_home();  break;
+  case 54:
+  case 55:
+  case 56:
+  case 57:
+  case 58:
+  case 59: {  // 54-59 tool offsets
+    int tool_id=cmd-54;
+    hexapod_tool_offset(tool_id,parsenumber('X',h.tool_offset[tool_id].x),
+                                parsenumber('Y',h.tool_offset[tool_id].y),
+                                parsenumber('Z',h.tool_offset[tool_id].z));
+    break;
+  }
   case 90:  mode_abs=1;  break;  // absolute mode
   case 91:  mode_abs=0;  break;  // relative mode
 

@@ -337,8 +337,8 @@ void hexapod_line(float newx,float newy,float newz,float newu,float newv,float n
 
   //@TODO: find which of the wrist positions moves the furthest, base everything on that.
   // ** BEGIN TOTAL JUNK
-  long steps_pos=ceil(dpos.Length()/STEPS_PER_CM);
-  long steps_rpy=ceil(drpy.Length()/STEPS_PER_DEG);
+  long steps_pos=ceil(dpos.Length()/SEGMENTS_PER_CM);
+  long steps_rpy=ceil(drpy.Length()/SEGMENTS_PER_DEG);
   long steps = ( steps_pos > steps_rpy ? steps_pos : steps_rpy);
   if(steps>MAX_SEGMENTS) steps=MAX_SEGMENTS;
   // ** END TOTAL JUNK
@@ -503,6 +503,79 @@ void hexapod_find_home() {
   }
   hexapod_position(0,0,0,0,0,0);
   motor_position(0,0,0,0,0,0);
+}
+
+
+//------------------------------------------------------------------------------
+// This method assumes the limits have already been checked.
+// This method assumes the start and end radius match.
+// This method assumes arcs are not >180 degrees (PI radians)
+// cx/cy - center of circle
+// x/y - end position
+// dir - ARC_CW or ARC_CCW to control direction of arc
+void hexapod_arc(float cx,float cy,float x,float y,float z,float dir,float new_feed_rate) {
+  Vector3 offset_pos = hexapod_get_end_plus_offset();
+  
+  // get radius
+  float dx = offset_pos.x - cx;
+  float dy = offset_pos.y - cy;
+  float radius=sqrt(dx*dx+dy*dy);
+
+  // find angle of arc (sweep)
+  float angle1=atan3(dy,dx);
+  float angle2=atan3(y-cy,x-cx);
+  float theta=angle2-angle1;
+  
+  if(dir>0 && theta<0) angle2+=2*PI;
+  else if(dir<0 && theta>0) angle1+=2*PI;
+  
+  theta=angle2-angle1;
+  
+  // get length of arc
+  // float circ=PI*2.0*radius;
+  // float len=theta*circ/(PI*2.0);
+  // simplifies to
+  float len = abs(theta) * radius;
+
+  int i, segments = floor( len / SEGMENTS_PER_DEG );
+ 
+  float nx, ny, nz, angle3, scale;
+
+  for(i=0;i<segments;++i) {
+    // interpolate around the arc
+    scale = ((float)i)/((float)segments);
+    
+    angle3 = ( theta * scale ) + angle1;
+    nx = cx + cos(angle3) * radius;
+    ny = cy + sin(angle3) * radius;
+    nz = ( z - offset_pos.z ) * scale + offset_pos.z;
+    // send it to the planner
+    hexapod_line(nx,ny,nz,h.ee.r,h.ee.p,h.ee.y,new_feed_rate);
+  }
+  
+  hexapod_line(x,y,z,h.ee.r,h.ee.p,h.ee.y,new_feed_rate);
+}
+
+
+
+void hexapod_tool_offset(int axis,float x,float y,float z) {
+  h.tool_offset[axis].x=x;
+  h.tool_offset[axis].y=y;
+  h.tool_offset[axis].z=z;
+}
+
+
+Vector3 hexapod_get_end_plus_offset() {
+  return Vector3(h.tool_offset[h.current_tool].x + h.ee.pos.x,
+                 h.tool_offset[h.current_tool].y + h.ee.pos.y,
+                 h.tool_offset[h.current_tool].z + h.ee.pos.z);
+}
+
+
+void hexapod_tool_change(int tool_id) {
+  if(tool_id < 0) tool_id=0;
+  if(tool_id > NUM_TOOLS) tool_id=NUM_TOOLS;
+  h.current_tool=tool_id;
 }
 
 
