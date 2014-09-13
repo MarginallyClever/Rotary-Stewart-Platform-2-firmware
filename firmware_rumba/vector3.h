@@ -8,7 +8,7 @@
 // please see http://www.github.com/MarginallyClever/GcodeCNCDemo for more information.
 
 
-#include <math.h>
+#include "Arduino.h"
 
 
 class Vector3 {

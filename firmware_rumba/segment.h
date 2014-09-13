@@ -21,6 +21,7 @@ struct Axis {
   int absdelta;
   int delta;
   int dir;
+  float delta_normalized;
 };
 
 
@@ -30,9 +31,13 @@ struct Segment {
   int steps_taken;
   int accel_until;
   int decel_after;
-  long feed_rate_start;
-  long feed_rate_nominal;
-  long feed_rate_end;
+  float feed_rate_max;
+  float feed_rate_start;
+  float feed_rate_start_max;
+  float feed_rate_end;
+  char nominal_length_flag;
+  char recalculate_flag;
+  char busy;
 };
 
 

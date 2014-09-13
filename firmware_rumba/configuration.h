@@ -11,10 +11,10 @@
 //------------------------------------------------------------------------------
 // CONSTANTS
 //------------------------------------------------------------------------------
-//#define VERBOSE              (1)  // add to get a lot more serial output.
+#define VERBOSE              (0)  // increase this number to get more output
 //#define DEBUG_SWITCHES       (1)
 
-#define VERSION              (1)  // firmware version
+#define EEPROM_VERSION       (1)  // firmware version
 
 #define BAUD                 (57600)  // How fast is the Arduino talking?
 #define MAX_BUF              (64)  // What is the longest message we can store?
@@ -22,41 +22,17 @@
 #define STEPS_PER_TURN       (400)  // depends on your stepper motor.  most are 200.
 #define MICROSTEPS           (16.0)
 
-#define MAX_FEEDRATE         (16000.0)  // depends on timer interrupt & hardware
-#define MIN_FEEDRATE         (0.01)
+#define MAX_FEEDRATE         (40000.0)  // depends on timer interrupt & hardware
+#define MIN_FEEDRATE         (500)
+#define DEFAULT_FEEDRATE     (3000.0)
+#define DEFAULT_ACCELERATION (5)
 
-// measurements based on computer model of robot
 #define NUM_AXIES            (6)
-#define NUM_TOOLS            (6)
-#define BICEP_LENGTH         ( 5.000)
-#define FOREARM_LENGTH       (16.750)
-#define SWITCH_ANGLE         (19.690)
-// top center to wrist hole: X7.635 Y+/-0.553 Z0.87
-#define T2W_X                ( 7.635)
-#define T2W_Y                ( 0.553)
-#define T2W_Z                (-0.870)
-// base center to shoulder hole: X8.093 Y+/-2.15 Z7.831
-#define B2S_X                ( 8.093)
-#define B2S_Y                ( 2.150)
-#define B2S_Z                ( 6.618)
-// hardware/software pins
-#define MOTOR_0_DIR_PIN  (16)
-#define MOTOR_0_STEP_PIN (17)
-#define MOTOR_1_DIR_PIN  (47)
-#define MOTOR_1_STEP_PIN (54)
-#define MOTOR_2_DIR_PIN  (56)
-#define MOTOR_2_STEP_PIN (57)
-#define MOTOR_3_DIR_PIN  (22)
-#define MOTOR_3_STEP_PIN (23)
-#define MOTOR_4_DIR_PIN  (25)
-#define MOTOR_4_STEP_PIN (26)
-#define MOTOR_5_DIR_PIN  (28)
-#define MOTOR_5_STEP_PIN (29)
 
-// for splitting lines and look-ahead
-#define SEGMENTS_PER_CM      (10)
-#define SEGMENTS_PER_DEG     (5)
+// related to number of instructions that can be buffered.  must be a power of two > 1.
 #define MAX_SEGMENTS         (64)  // must be a power of 2
+// for splitting lines and look-ahead
+#define MM_PER_SEGMENT       (3)
 
 // convenience macros
 #define TWOPI                (PI*2.0)
@@ -64,10 +40,11 @@
 #define RAD2DEG              (180.0/PI)
 
 #define MICROSTEPS_PER_TURN  (STEPS_PER_TURN*MICROSTEPS)
-#define CIRCUMFERENCE        (BICEP_LENGTH*TWOPI)
-#define MICROSTEP_DISTANCE   (CIRCUMFERENCE/MICROSTEPS_PER_TURN)  // distance elbow moves in a single microstep
 #define MICROSTEP_PER_DEGREE (MICROSTEPS_PER_TURN/360.0)
 
+
+// time passed with no instruction?  Make sure PC knows we are waiting.
+#define TIMEOUT_OK           (1000)
 // timing
 #define CLOCK_FREQ           (16000000L)
 #define MAX_COUNTER          (65536L)
@@ -76,9 +53,43 @@
 // optimize code, please
 #define FORCE_INLINE         __attribute__((always_inline)) inline
 
-#ifndef NULL
-#define NULL 0
-#endif
+#ifndef CRITICAL_SECTION_START
+  #define CRITICAL_SECTION_START  unsigned char _sreg = SREG;  cli();
+  #define CRITICAL_SECTION_END    SREG = _sreg;
+#endif //CRITICAL_SECTION_START
+
+
+
+// hardware/software pins
+#define MOTOR_0_DIR_PIN    (16)
+#define MOTOR_0_STEP_PIN   (17)
+#define MOTOR_0_ENABLE_PIN (48)
+#define MOTOR_0_LIMIT_PIN  (37)
+
+#define MOTOR_1_DIR_PIN    (47)
+#define MOTOR_1_STEP_PIN   (54)
+#define MOTOR_1_ENABLE_PIN (55)
+#define MOTOR_1_LIMIT_PIN  (36)
+
+#define MOTOR_2_DIR_PIN    (56)
+#define MOTOR_2_STEP_PIN   (57)
+#define MOTOR_2_ENABLE_PIN (62)
+#define MOTOR_2_LIMIT_PIN  (35)
+
+#define MOTOR_3_DIR_PIN    (22)
+#define MOTOR_3_STEP_PIN   (23)
+#define MOTOR_3_ENABLE_PIN (27)
+#define MOTOR_3_LIMIT_PIN  (34)
+
+#define MOTOR_4_DIR_PIN    (25)
+#define MOTOR_4_STEP_PIN   (26)
+#define MOTOR_4_ENABLE_PIN (24)
+#define MOTOR_4_LIMIT_PIN  (33)
+
+#define MOTOR_5_DIR_PIN    (28)
+#define MOTOR_5_STEP_PIN   (29)
+#define MOTOR_5_ENABLE_PIN (39)
+#define MOTOR_5_LIMIT_PIN  (32)
 
 
 /**

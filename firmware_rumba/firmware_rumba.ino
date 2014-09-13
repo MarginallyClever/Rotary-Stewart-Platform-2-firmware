@@ -19,14 +19,11 @@
 // GLOBALS
 //------------------------------------------------------------------------------
 // speeds
-float feed_rate=0;  // human version
+float feed_rate=DEFAULT_FEEDRATE;  // how fast the EE moves in cm/s
+float acceleration=DEFAULT_ACCELERATION;
 
 // settings
 char mode_abs=1;  // absolute mode?
-
-#ifdef VERBOSE
-char *letter="UVWXYZ";
-#endif
 
 
 //------------------------------------------------------------------------------
@@ -79,76 +76,11 @@ float feedrate(float nfr) {
 
 
 /**
- * Set the motor position in number of steps
- */
-void motor_position(int n0,int n1,int n2,int n3,int n4,int n5) {
-  // here is a good place to add sanity tests
-  h.arms[0].last_step=n0;
-  h.arms[1].last_step=n1;
-  h.arms[2].last_step=n2;
-  h.arms[3].last_step=n3;
-  h.arms[4].last_step=n4;
-  h.arms[5].last_step=n5;
-}
-
-
-/**
- * Grips the power on the motors
- **/
-void motor_enable() {
-  int i;
-  for(i=0;i<NUM_AXIES;++i) {
-    digitalWrite(h.arms[i].motor_enable_pin,LOW);
-  }
-}
-
-
-/**
- * Releases the power on the motors
- **/
-void motor_disable() {
-  int i;
-  for(i=0;i<NUM_AXIES;++i) {
-    digitalWrite(h.arms[i].motor_enable_pin,HIGH);
-  }
-}
-
-
-/**
- * print the current position, feedrate, and absolute mode.
- */
-void hexapod_where() {
-  Vector3 offset = hexapod_get_end_plus_offset();
-  output("X",offset.x);
-  output("Y",offset.y);
-  output("Z",offset.z);
-  output("U",h.ee.r);
-  output("V",h.ee.p);
-  output("W",h.ee.y);
-  output("F",feed_rate);
-  Serial.println(mode_abs?"ABS":"REL");
-} 
-
-
-/**
- * print the current motor positions in steps
- */
-void motor_where() {
-  output("0",h.arms[0].last_step);
-  output("1",h.arms[1].last_step);
-  output("2",h.arms[2].last_step);
-  output("3",h.arms[3].last_step);
-  output("4",h.arms[4].last_step);
-  output("5",h.arms[5].last_step);
-} 
-
-
-/**
  * display helpful information
  */
 void help() {
   Serial.print(F("StewartPlatform v4-2"));
-  Serial.println(VERSION);
+  Serial.println(EEPROM_VERSION);
   Serial.println(F("Commands:"));
   Serial.println(F("M17/M18; - enable/disable motors"));
   Serial.println(F("M100; - this help message"));
@@ -163,17 +95,14 @@ void help() {
  */
 void setup() {
   Serial.begin(BAUD);  // open coms
-  help();  // say hello
 
-  pinMode(13,OUTPUT);
-
-  hexapod_setup();
-  motor_enable();
-  feedrate(200);  // set default speed
-  hexapod_position(0,0,0,0,0,0);
-  motor_position(0,0,0,0,0,0);
-  //hexapod_find_home();
+  motor_setup();
+  segment_setup();
   
+  hexapod_setup();
+  feedrate(DEFAULT_FEEDRATE);  // set default speed
+  
+  help();  // say hello
   parser_ready();
 }
 
