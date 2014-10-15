@@ -85,9 +85,9 @@ void setup() {
 void loop() {
   int i=0;
 
-  //for(i=0;i<6;++i) {
+  for(i=0;i<6;++i) {
     move_motor(i);
-  //}
+  }
 }
 
 
