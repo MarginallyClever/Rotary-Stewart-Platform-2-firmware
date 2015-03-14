@@ -1,0 +1,7 @@
+*.class
+*.class
+
+*.class
+
+*.classpath
+.settings/org.eclipse.ltk.core.refactoring.prefs
