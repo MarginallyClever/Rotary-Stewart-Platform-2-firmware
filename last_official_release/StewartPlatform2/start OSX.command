@@ -9,4 +9,4 @@ SOURCE="$(readlink "$SOURCE")"
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-java -Djava.library.path="$DIR" -jar "$DIR/Arm3.jar"
+java -Djava.library.path="$DIR" -jar "$DIR/RotaryStewartPlatform2.jar"

@@ -17,7 +17,7 @@ if defined JAVA_HOME (
   goto end
 )
 
-"%JAVA_HOME%\bin\java.exe" -jar Arm3.jar
+"%JAVA_HOME%\bin\java.exe" -jar RotaryStewartPlatform2.jar
 
 :end
 @pause
