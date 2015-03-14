@@ -27,7 +27,7 @@
 #define T2W_X                ( 7.635)
 #define T2W_Y                ( 0.553)
 #define T2W_Z                (-0.870)
-// base center to shoulder hole (relative): X8.093 Y+/-2.15 Z6.618
+// base center to shoulder hole (relative): X8.093 Y+/-2.15 Z7.831
 #define B2S_X                ( 8.093)
 #define B2S_Y                ( 2.150)
 #define B2S_Z                ( 6.618)

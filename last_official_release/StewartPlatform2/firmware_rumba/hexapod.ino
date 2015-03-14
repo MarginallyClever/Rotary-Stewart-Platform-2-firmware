@@ -155,7 +155,7 @@ void hexapod_update_endeffector(Vector3 &mov,Vector3 &rpy) {
  * Update the wrist positions according to the end effector
  */
 void hexapod_update_wrists() {
-  Vector3 n,o,n1,o1;
+  Vector3 n1,o1;
   float c,s;
   int i;
   for(i=0;i<3;++i) {
@@ -165,12 +165,8 @@ void hexapod_update_wrists() {
     c=cos(i*TWOPI/3.0f);
     s=sin(i*TWOPI/3.0f);
 
-    n=robot.ee.forward;
-    o=robot.ee.up ^ robot.ee.forward;
-    o.Normalize();
-
-    n1 = n* c + o*s;
-    o1 = n*-s + o*c;
+    n1 = robot.ee.forward* c + robot.ee.left*s;
+    o1 = robot.ee.forward*-s + robot.ee.left*c;
 
     arma.wrist = robot.ee.pos + robot.ee.relative + n1*T2W_X - o1*T2W_Y + robot.ee.up*T2W_Z;
     armb.wrist = robot.ee.pos + robot.ee.relative + n1*T2W_X + o1*T2W_Y + robot.ee.up*T2W_Z;

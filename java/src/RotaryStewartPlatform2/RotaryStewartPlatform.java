@@ -144,7 +144,7 @@ extends Robot {
 	
 	boolean pDown=false;
 	boolean pWasOn=false;
-	boolean moveMode=false;
+	boolean moveMode=true;
 	
 	
 	public Vector3f getHome() {  return new Vector3f(HOME_X,HOME_Y,HOME_Z);  }
@@ -263,7 +263,10 @@ extends Robot {
 		if (state.angle_4 >  180) return false;
 		if (state.angle_5 < -180) return false;
 		if (state.angle_5 >  180) return false;*/
-		
+		if(Math.abs(state.iku)>30) return false;
+		if(Math.abs(state.ikv)>30) return false;
+		if(Math.abs(state.ikw)>30) return false;
+	
 		return true;
 	}
 	
@@ -275,10 +278,15 @@ extends Robot {
 	 * @return 0 if successful, 1 if the IK solution cannot be found.
 	 */
 	protected boolean IK(MotionState state) {
-		IK_update_end_effector(state);
-		IK_update_wrists(state);
-		IK_update_shoulder_angles(state);
-	    
+		try {
+			IK_update_end_effector(state);
+			IK_update_wrists(state);
+			IK_update_shoulder_angles(state);
+		}
+		catch(AssertionError e) {
+			return false;
+		}
+		
 		return true;
 	}
 	
@@ -342,7 +350,7 @@ extends Robot {
 		  }
 	}
 	
-	protected void IK_update_shoulder_angles(MotionState state) {
+	protected void IK_update_shoulder_angles(MotionState state) throws AssertionError {
 		Vector3f ortho = new Vector3f(),w = new Vector3f(),wop = new Vector3f(),temp = new Vector3f(),r = new Vector3f();
 		  float a,b,d,r1,r0,hh,y,x;
 		  
@@ -351,8 +359,8 @@ extends Robot {
 		    Arm arm = state.arms[i];
 		    
 		    // project wrist position onto plane of bicep (wop)
-		    ortho.x=(float)Math.cos((i/2)*Math.PI*2.0f/3.0f);
-		    ortho.y=(float)Math.sin((i/2)*Math.PI*2.0f/3.0f);
+		    ortho.x=(float)Math.cos((int)(i/2)*Math.PI*2.0f/3.0f);
+		    ortho.y=(float)Math.sin((int)(i/2)*Math.PI*2.0f/3.0f);
 		    ortho.z=0;
 		    
 		    //w = arm.wrist - arm.shoulder
@@ -370,6 +378,7 @@ extends Robot {
 		    // we need to find wop-elbow to calculate the angle at the shoulder.
 		    // wop-elbow is not the same as wrist-elbow.
 		    b=(float)Math.sqrt(FOREARM_LENGTH*FOREARM_LENGTH-a*a);
+		    if(Float.isNaN(b)) throw new AssertionError();
 
 		    // use intersection of circles to find elbow point.
 		    //a = (r0r0 - r1r1 + d*d ) / (2*d) 
@@ -389,6 +398,7 @@ extends Robot {
 		    temp.add(arm.shoulder);
 		    // with a and r0 we can find h, the distance from midpoint to intersections.
 		    hh=(float)Math.sqrt(r0*r0-a*a);
+		    if(Float.isNaN(hh)) throw new AssertionError();
 		    // get a normal to the line wop in the plane orthogonal to ortho
 		    r.cross(ortho,wop);
 		    r.scale(hh);
