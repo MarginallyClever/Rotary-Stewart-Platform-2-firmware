@@ -30,6 +30,10 @@ extends Robot {
 	float HOME_B = 0.0f;
 	float HOME_C = 0.0f;
 	
+	float LIMIT_U=15;
+	float LIMIT_V=15;
+	float LIMIT_W=15;
+	
 	float HOME_RIGHT_X = 0;
 	float HOME_RIGHT_Y = 0;
 	float HOME_RIGHT_Z = -1;
@@ -178,10 +182,10 @@ extends Robot {
 		// check near limit
 		if(temp.length() < BASE_TO_SHOULDER_MINIMUM_LIMIT) return false;
 */
-		// seems doable
-		if(IK(state)==false) return false;
 		// angle are good?
 		if(CheckAngleLimits(state)==false) return false;
+		// seems doable
+		if(IK(state)==false) return false;
 
 		// OK
 		return true;
@@ -246,8 +250,9 @@ extends Robot {
 		model_base.Load(gl2, current+"/base.STL");
 	}
 	
-	protected boolean CheckAngleLimits(MotionState state) {/*
+	protected boolean CheckAngleLimits(MotionState state) {
 		// machine specific limits
+		/*
 		if (state.angle_0 < -180) return false;
 		if (state.angle_0 >  180) return false;
 		if (state.angle_2 <  -20) return false;
@@ -262,10 +267,11 @@ extends Robot {
 		if (state.angle_4 < -180) return false;
 		if (state.angle_4 >  180) return false;
 		if (state.angle_5 < -180) return false;
-		if (state.angle_5 >  180) return false;*/
-		if(Math.abs(state.iku)>30) return false;
-		if(Math.abs(state.ikv)>30) return false;
-		if(Math.abs(state.ikw)>30) return false;
+		if (state.angle_5 >  180) return false;
+		*/
+		if(Math.abs(state.iku)>LIMIT_U) return false;
+		if(Math.abs(state.ikv)>LIMIT_V) return false;
+		if(Math.abs(state.ikw)>LIMIT_W) return false;
 	
 		return true;
 	}
@@ -438,7 +444,7 @@ extends Robot {
 		if(oDown) ru=0.1f;
 		if(lDown) ru=-0.1f;
 
-		//if(rw!=0 || rv!=0 || ru!=0 )
+		if(rw!=0 || rv!=0 || ru!=0 )
 		{
 			// On a 3-axis robot when homed the forward axis of the finger tip is pointing downward.
 			// More complex arms start from the same assumption.
@@ -477,7 +483,7 @@ extends Robot {
 				arm_moved=true;
 			}
 		} else {
-			motion_future.finger_tip.set(motion_now.finger_tip);
+			motion_future.set(motion_now);
 		}
 	}
 	
