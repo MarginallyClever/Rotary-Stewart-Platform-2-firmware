@@ -16,6 +16,7 @@ import RotaryStewartPlatform2.PrimitiveSolids;
 import javax.media.opengl.GL2;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 
 
 public class World
@@ -217,5 +218,9 @@ implements ActionListener {
 	
 	public void Init(GL2 gl2) {
 		robot0.Init(gl2);
+	}
+	
+	public void addCSGUI(JPanel parent) {
+		robot0.addCSGUI(parent);
 	}
 }

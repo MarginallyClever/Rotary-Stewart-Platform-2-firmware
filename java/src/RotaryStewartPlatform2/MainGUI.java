@@ -2,6 +2,7 @@ package RotaryStewartPlatform2;
 
 
 import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -89,7 +90,6 @@ implements ActionListener, GLEventListener, MouseListener, MouseMotionListener, 
 	final GLJPanel glcanvas;
 	final JPanel right_panel;
 	final JSplitPane splitter;
-	final JButton a,b,c;
 	
 	
 	
@@ -153,21 +153,16 @@ implements ActionListener, GLEventListener, MouseListener, MouseMotionListener, 
         animator.add(glcanvas);
         glcanvas.addGLEventListener(this);
         
-        
-        a=new JButton("One");
-		b=new JButton("Two");
-		c=new JButton("Three");
+        // create context sensitive menu
         right_panel = new JPanel();
-        right_panel.setLayout(new BoxLayout(right_panel, BoxLayout.Y_AXIS));
-        right_panel.add(a);
-        right_panel.add(b);
-        right_panel.add(c);
-        a.addActionListener(this);
-        b.addActionListener(this);
-        c.addActionListener(this);
+        //right_panel.setLayout(new BoxLayout(right_panel, BoxLayout.Y_AXIS));
+        right_panel.setLayout(new GridLayout(0,1));
         
-        
+        // reset context sensitive menu
+        right_panel.removeAll();
+        world.addCSGUI(right_panel);
 
+        
         splitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitter.add(glcanvas);
         splitter.add(right_panel);
@@ -400,15 +395,6 @@ implements ActionListener, GLEventListener, MouseListener, MouseMotionListener, 
 		if( subject == buttonHalt ) {
 			world.robot0.Halt();
 			return;
-		}
-		if( subject == a ) {
-			JOptionPane.showMessageDialog(null, "A","Click", JOptionPane.INFORMATION_MESSAGE);
-		}
-		if( subject == b ) {
-			JOptionPane.showMessageDialog(null, "B","Click", JOptionPane.INFORMATION_MESSAGE);
-		}
-		if( subject == c ) {
-			JOptionPane.showMessageDialog(null, "C","Click", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 

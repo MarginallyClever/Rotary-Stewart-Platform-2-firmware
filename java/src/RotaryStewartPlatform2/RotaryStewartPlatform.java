@@ -1,8 +1,16 @@
 package RotaryStewartPlatform2;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.vecmath.Vector3f;
 import javax.media.opengl.GL2;
 
+import java.awt.Color;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 
@@ -16,9 +24,9 @@ extends Robot {
 	//machine dimensions
 	final float BASE_TO_SHOULDER_X   =( 8.093f);  // measured in solidworks, relative to base origin
 	final float BASE_TO_SHOULDER_Y   =( 2.150f);
-	final float BASE_TO_SHOULDER_Z   =( 6.618f);
-	final float BICEP_LENGTH         =( 5.0f);
-	final float FOREARM_LENGTH       =(16.75f);
+	final float BASE_TO_SHOULDER_Z   =( 6.610f);
+	final float BICEP_LENGTH         =( 5.000f);
+	final float FOREARM_LENGTH       =(16.750f);
 	final float WRIST_TO_FINGER_X    =( 7.635f);
 	final float WRIST_TO_FINGER_Y    =( 0.553f);
 	final float WRIST_TO_FINGER_Z    =(-0.870f);  // measured in solidworks, relative to finger origin
@@ -149,6 +157,9 @@ extends Robot {
 	boolean pDown=false;
 	boolean pWasOn=false;
 	boolean moveMode=true;
+	
+
+	final JButton home=null,x=null,y=null,z=null;
 	
 	
 	public Vector3f getHome() {  return new Vector3f(HOME_X,HOME_Y,HOME_Z);  }
@@ -680,12 +691,12 @@ extends Robot {
 	public void render(GL2 gl2) {
 		int i;
 
-		boolean draw_finger_star=true;
+		boolean draw_finger_star=false;
 		boolean draw_base_star=false;
 		boolean draw_shoulder_to_elbow=false;
-		boolean draw_shoulder_star=true;
-		boolean draw_elbow_star=true;
-		boolean draw_wrist_star=true;
+		boolean draw_shoulder_star=false;
+		boolean draw_elbow_star=false;
+		boolean draw_wrist_star=false;
 		boolean draw_stl=true;
 
 		//RebuildShoulders(motion_now);
@@ -696,7 +707,7 @@ extends Robot {
 			// base
 			gl2.glPushMatrix();
 			gl2.glColor3f(0, 0, 1);
-			gl2.glTranslatef(0, 0, BASE_TO_SHOULDER_Z);
+			gl2.glTranslatef(0, 0, BASE_TO_SHOULDER_Z+0.6f);
 			gl2.glRotatef(90, 0, 0, 1);
 			gl2.glRotatef(90, 1, 0, 0);
 			gl2.glScalef(0.1f,0.1f,0.1f);
@@ -946,5 +957,55 @@ extends Robot {
 		out.add(tempz);
 				
 		return out;
+	}
+	
+
+	public void addCSGUI(JPanel parent) {
+		super.addCSGUI(parent);
+		/*
+		JPanel margin = new JPanel();
+        parent.add(margin);
+        margin.setBorder(new EmptyBorder(5, 5, 5, 5));
+		JPanel container = new JPanel();
+		margin.add(container);
+		margin.setLayout(new GridLayout(0,1));
+		*/
+		JPanel container = new JPanel();
+		container.setBorder(BorderFactory.createLineBorder(Color.black));
+		//container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+		container.setLayout(new GridLayout(0,1));
+		
+		final JButton home=new JButton("Home");
+        final JButton x=new JButton("X");
+        final JButton y=new JButton("Y");
+        final JButton z=new JButton("Z");
+        container.add(home);
+		container.add(x);
+		container.add(y);
+		container.add(z);
+		home.addActionListener(this);
+        x.addActionListener(this);
+        y.addActionListener(this);
+        z.addActionListener(this);
+        parent.add(container);
+	}
+	
+
+	public void actionPerformed(ActionEvent e) {
+		Object subject = e.getSource();
+
+		if(subject == home ) {
+			JOptionPane.showMessageDialog(null, "Go Home","Click", JOptionPane.INFORMATION_MESSAGE);
+		}
+		if(subject == x ) {
+			JOptionPane.showMessageDialog(null, "Move X","Click", JOptionPane.INFORMATION_MESSAGE);
+		}
+		if(subject == y ) {
+			JOptionPane.showMessageDialog(null, "Move Y","Click", JOptionPane.INFORMATION_MESSAGE);
+		}
+		if(subject == z ) {
+			JOptionPane.showMessageDialog(null, "Move Z","Click", JOptionPane.INFORMATION_MESSAGE);
+		}
+		super.actionPerformed(e);
 	}
 }

@@ -1,19 +1,23 @@
 package RotaryStewartPlatform2;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 
-public class Robot extends SerialConnection
-implements SerialConnectionReadyListener {
+public class Robot extends SerialConnection implements ActionListener, SerialConnectionReadyListener {
 	//comms	
 	private boolean arduinoReady=false;
 	private boolean isConfirmed=false;
@@ -28,6 +32,8 @@ implements SerialConnectionReadyListener {
 	
 	private boolean dialog_result;  // so dialog boxes can return an ok/cancel
 
+	final JButton a=null,b=null,c=null;
+	
 	
 	public boolean IsRunning() { return running; }
 	public boolean IsPaused() { return paused; }
@@ -192,7 +198,36 @@ implements SerialConnectionReadyListener {
 	 * returns a jpanel containing the GUI.  The GUI has a pointer to the object in question.
 	 * 
 	 */
-	public void AddGUI(JComponent parent) {
-		
+	public void addCSGUI(JPanel parent) {
+		JPanel container = new JPanel();
+		container.setBorder(BorderFactory.createLineBorder(Color.black));
+		//container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+		container.setLayout(new GridLayout(0,1));
+        
+		final JButton a=new JButton("Connect to...");
+        final JButton b=new JButton("Disconnect");
+        final JButton c=new JButton("Rescan");
+        container.add(a);
+		container.add(b);
+		container.add(c);
+        a.addActionListener(this);
+        b.addActionListener(this);
+        c.addActionListener(this);
+
+        parent.add(container);
+	}
+	
+
+	public void actionPerformed(ActionEvent e) {
+		Object subject = e.getSource();
+		if( subject == a ) {
+			JOptionPane.showMessageDialog(null, "Connect to...","Click", JOptionPane.INFORMATION_MESSAGE);
+		}
+		if( subject == b ) {
+			JOptionPane.showMessageDialog(null, "Disconnect","Click", JOptionPane.INFORMATION_MESSAGE);
+		}
+		if( subject == c ) {
+			JOptionPane.showMessageDialog(null, "Rescan","Click", JOptionPane.INFORMATION_MESSAGE);
+		}
 	}
 }
