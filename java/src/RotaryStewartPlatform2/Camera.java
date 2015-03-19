@@ -11,7 +11,7 @@ public class Camera {
 	Vector3f forward = new Vector3f(0,1,0);
 	Vector3f up = new Vector3f(0,0,1);
 	Vector3f right = new Vector3f(1,0,0);
-	float pan, tilt;
+	float pan=0, tilt=0;
 	int prevMouseX, prevMouseY;
 	boolean mouseRButtonDown = false;
 	boolean wDown=false;
@@ -22,11 +22,7 @@ public class Camera {
 	boolean eDown=false;
 
 	
-	public Camera() {
-		position.set(0,100,-20);
-		pan=0;
-		tilt=80;
-	}
+	public Camera() {}
 
 	
 	public void mousePressed(MouseEvent e) {

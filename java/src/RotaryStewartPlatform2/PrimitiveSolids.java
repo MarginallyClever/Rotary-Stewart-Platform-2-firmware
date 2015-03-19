@@ -4,13 +4,11 @@ import javax.media.opengl.GL2;
 
 
 public class PrimitiveSolids {
-	static void drawCylinder(GL2 gl2,Cylinder tube) {
-		/*
-		gl2.glBegin(GL2.GL_LINES);
-		gl2.glVertex3f(tube.GetP1().x, tube.GetP1().y, tube.GetP1().z);
-		gl2.glVertex3f(tube.GetP2().x, tube.GetP2().y, tube.GetP2().z);
-		gl2.glEnd();
-		*/
+	static void drawCylinder(GL2 gl2,Cylinder tube) {		
+		//gl2.glBegin(GL2.GL_LINES);
+		//gl2.glVertex3f(tube.GetP1().x, tube.GetP1().y, tube.GetP1().z);
+		//gl2.glVertex3f(tube.GetP2().x, tube.GetP2().y, tube.GetP2().z);
+		//gl2.glEnd();
 
 		Vector3f tx = new Vector3f();
 		Vector3f ty = new Vector3f();
@@ -194,7 +192,6 @@ public class PrimitiveSolids {
 
 	
 	static public void drawGrid(GL2 gl2,int grid_size,int grid_space) {
-		gl2.glColor3f(0.5f,0.5f,0.5f);
 		gl2.glNormal3f(0,0,1);
 	
 		gl2.glBegin(GL2.GL_LINES);
@@ -207,24 +204,27 @@ public class PrimitiveSolids {
 			}
 		}
 		gl2.glEnd();
+	}
 	
+	static public void DrawXYZ(GL2 gl2) {
 		gl2.glBegin(GL2.GL_LINES);
 		
 		// +X line
-		gl2.glColor3f(0.5f,0,0);
+		gl2.glColor3f(1,0,0);
 		gl2.glVertex3f(0,0,0);
-		gl2.glVertex3f(grid_size*2,0,0);
+		gl2.glVertex3f(1,0,0);
 		// +Y line
-		gl2.glColor3f(0,0.5f,0);
+		gl2.glColor3f(0,1,0);
 		gl2.glVertex3f(0,0,0);
-		gl2.glVertex3f(0,grid_size*2,0);
+		gl2.glVertex3f(0,1,0);
 		// +Z line
-		gl2.glColor3f(0,0,0.5f);
+		gl2.glColor3f(0,0,1);
 		gl2.glVertex3f(0,0,0);
-		gl2.glVertex3f(0,0,grid_size*2);
+		gl2.glVertex3f(0,0,1);
 	
 		gl2.glEnd();
 	}
+	
 	static public void drawGrid(GL2 gl2) {
 		drawGrid(gl2,50,1);
 	}

@@ -2,6 +2,7 @@ package RotaryStewartPlatform2;
 
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,8 +27,6 @@ import java.util.jar.JarFile;
 */
 import java.util.prefs.Preferences;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -62,36 +61,41 @@ implements ActionListener, GLEventListener, MouseListener, MouseMotionListener, 
 
 	World world;
 
-	/** menus */
+	// menus
 	private JMenuBar mainMenu;
     private JMenuItem buttonStart, buttonStartAt, buttonPause, buttonHalt;
     private JMenuItem buttonAbout, buttonCheckForUpdate;
     private JMenuItem buttonQuit;
 	
-	/* window management */
+	// window management
     final JFrame frame; 
-    /* animation system */
+	final GLJPanel glcanvas;
+	final JPanel contextPanel;
+	final JSplitPane splitter;
+
+	private float window_width=0;
+	private float window_height=0;
+	private float window_aspect_ratio=1;
+	// animation system
     final Animator animator = new Animator();
     
-    /* timing for animations */
+    // timing for animations
     long start_time;
     long last_time;
     
-
 	// settings
 	private Preferences prefs;
-	private String[] recentFiles = {"","","","","","","","","",""};
+	private RecentFiles recentFiles;
 	
 	// Generators
 	GcodeGenerator [] generators;
 	JMenuItem generatorButtons[];
-    
-	
-	final GLJPanel glcanvas;
-	final JPanel right_panel;
-	final JSplitPane splitter;
 	
 	
+	float getWindowAspectRatio() { return window_aspect_ratio; }
+	float getWindowWidth() { return window_width; }
+	float getWindowHeight() { return window_height; }
+
 	
 	static public MainGUI getSingleton() {
 		if(__singleton==null) {
@@ -108,6 +112,7 @@ implements ActionListener, GLEventListener, MouseListener, MouseMotionListener, 
 	
 	protected MainGUI() {
 		prefs = Preferences.userRoot().node("GcodeSender");
+		recentFiles = new RecentFiles(prefs);
 /*
 		try {
 			String s = getPath(this.getClass());
@@ -154,18 +159,18 @@ implements ActionListener, GLEventListener, MouseListener, MouseMotionListener, 
         glcanvas.addGLEventListener(this);
         
         // create context sensitive menu
-        right_panel = new JPanel();
+        contextPanel = new JPanel();
         //right_panel.setLayout(new BoxLayout(right_panel, BoxLayout.Y_AXIS));
-        right_panel.setLayout(new GridLayout(0,1));
+        contextPanel.setLayout(new GridLayout(0,1));
         
         // reset context sensitive menu
-        right_panel.removeAll();
-        world.addCSGUI(right_panel);
+        contextPanel.removeAll();
+        world.addCSGUI(contextPanel);
 
         
         splitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitter.add(glcanvas);
-        splitter.add(right_panel);
+        splitter.add(contextPanel);
 		splitter.setResizeWeight(0.9);
 		splitter.setDividerLocation(0.9);
 		frame.addKeyListener(this);
@@ -318,10 +323,11 @@ implements ActionListener, GLEventListener, MouseListener, MouseMotionListener, 
         
         mainMenu.add(menu);
         
-        mainMenu.add(world.updateMenu());
+        JMenu worldMenu = world.updateMenu();
+        if(worldMenu!=null) mainMenu.add(worldMenu);
 
+        // TODO move both of these to a specific robot?
         mainMenu.add(LoadGenerateMenu());
-        
         mainMenu.add(LoadDrawMenu());
         
         mainMenu.updateUI();
@@ -399,11 +405,11 @@ implements ActionListener, GLEventListener, MouseListener, MouseMotionListener, 
 	}
 
 	protected void LoadConfig() {
-		GetRecentFiles();
+		//recentFiles.Get();
 	}
 
 	protected void SaveConfig() {
-		GetRecentFiles();
+		//recentFiles.Get();
 	}
 	
 	
@@ -419,76 +425,14 @@ implements ActionListener, GLEventListener, MouseListener, MouseMotionListener, 
 		}
 		return false;
 	}
-	
-	
-	/**
-	 * changes the order of the recent files list in the File submenu, saves the updated prefs, and refreshes the menus.
-	 * @param filename the file to push to the top of the list.
-	 */
-	public void UpdateRecentFiles(String filename) {
-		int cnt = recentFiles.length;
-		String [] newFiles = new String[cnt];
-		
-		newFiles[0]=filename;
-		
-		int i,j=1;
-		for(i=0;i<cnt;++i) {
-			if(!filename.equals(recentFiles[i]) && recentFiles[i] != "") {
-				newFiles[j++] = recentFiles[i];
-				if(j == cnt ) break;
-			}
-		}
-
-		recentFiles=newFiles;
-
-		// update prefs
-		for(i=0;i<cnt;++i) {
-			if( recentFiles[i]==null ) recentFiles[i] = new String("");
-			if( recentFiles[i].isEmpty()==false ) {
-				prefs.put("recent-files-"+i, recentFiles[i]);
-			}
-		}
-		
-		updateMenu();
-	}
-	
-	// A file failed to load.  Remove it from recent files, refresh the menu bar.
-	public void RemoveRecentFile(String filename) {
-		int i;
-		for(i=0;i<recentFiles.length-1;++i) {
-			if(recentFiles[i]==filename) {
-				break;
-			}
-		}
-		for(;i<recentFiles.length-1;++i) {
-			recentFiles[i]=recentFiles[i+1];
-		}
-		recentFiles[recentFiles.length-1]="";
-
-		// update prefs
-		for(i=0;i<recentFiles.length;++i) {
-			if(!recentFiles[i].isEmpty()) {
-				prefs.put("recent-files-"+i, recentFiles[i]);
-			}
-		}
-		
-		updateMenu();
-	}
-	
-	// Load recent files from prefs
-	public void GetRecentFiles() {
-		int i;
-		for(i=0;i<recentFiles.length;++i) {
-			recentFiles[i] = prefs.get("recent-files-"+i, recentFiles[i]);
-		}
-	}
 
 	/**
 	 * Open a gcode file to run on a robot.  This doesn't make sense if there's more than one robot!
 	 * @param filename the file to open
 	 */
 	public void OpenFile(String filename) {
-		
+		recentFiles.Add(filename);
+		updateMenu();
 	}
 
     @Override
@@ -496,14 +440,10 @@ implements ActionListener, GLEventListener, MouseListener, MouseMotionListener, 
     	GL2 gl2 = glautodrawable.getGL().getGL2();
         gl2.setSwapInterval(1);
 
-		gl2.glMatrixMode(GL2.GL_PROJECTION);
-		gl2.glLoadIdentity();
-		//gl2.glOrtho(0, screen_width, 0, screen_height, 1, -1);
-		GLU glu = new GLU();
-        glu.gluPerspective(45, (float)width/(float)height, 1.0f, 1000.0f);
-        gl2.glMatrixMode(GL2.GL_MODELVIEW);
-		gl2.glLoadIdentity();
-		
+        window_width=width;
+        window_height=height;
+        window_aspect_ratio = window_width / window_height;
+        
         world.setup( gl2 );
     }
     
@@ -547,7 +487,10 @@ implements ActionListener, GLEventListener, MouseListener, MouseMotionListener, 
     	
 		// Clear The Screen And The Depth Buffer
     	GL2 gl2 = glautodrawable.getGL().getGL2();
-    	gl2.glClearColor(0,0,0,0);
+    	//gl2.glClearColor(0,0,0,0);
+    	contextPanel.setOpaque(true);
+        Color c = contextPanel.getBackground();
+    	gl2.glClearColor(c.getRed()/255.0f, c.getGreen()/255.0f, c.getBlue()/255.0f, 0);
     	
         // Special handling for the case where the GLJPanel is translucent
         // and wants to be composited with other Java 2D content
@@ -559,7 +502,15 @@ implements ActionListener, GLEventListener, MouseListener, MouseMotionListener, 
         } else {
           gl2.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
         }
-        
+
+		gl2.glMatrixMode(GL2.GL_PROJECTION);
+		gl2.glLoadIdentity();
+		//gl2.glOrtho(0, screen_width, 0, screen_height, 1, -1);
+		GLU glu = new GLU();
+        glu.gluPerspective(60, window_aspect_ratio, 1.0f, 1000.0f);
+        gl2.glMatrixMode(GL2.GL_MODELVIEW);
+		gl2.glLoadIdentity();
+		
         // draw the world
         world.render( gl2, dt );
     }

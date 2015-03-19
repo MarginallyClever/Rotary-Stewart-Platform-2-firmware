@@ -1,8 +1,8 @@
 package RotaryStewartPlatform2;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.vecmath.Vector3f;
@@ -159,7 +159,8 @@ extends Robot {
 	boolean moveMode=true;
 	
 
-	final JButton home=null,x=null,y=null,z=null;
+	protected JButton view_home=null, view_go=null;
+	protected JLabelledTextField view_px,view_py,view_pz,view_rx,view_ry,view_rz;
 	
 	
 	public Vector3f getHome() {  return new Vector3f(HOME_X,HOME_Y,HOME_Z);  }
@@ -753,31 +754,42 @@ extends Robot {
 			model_top.Draw(gl2);
 			gl2.glPopMatrix();
 		}
-		// draw the forearms
-		gl2.glDisable(GL2.GL_LIGHTING);
 		
-		gl2.glBegin(GL2.GL_LINES);
+		
+		// draw the forearms
+		
+		Cylinder tube = new Cylinder();
+		gl2.glColor3f(0.8f,0.8f,0.8f);
+		tube.radius=0.15f;
 		for(i=0;i<6;++i) {
-			gl2.glColor3f(1,0,0);
-			gl2.glVertex3f(motion_now.arms[i].wrist.x,motion_now.arms[i].wrist.y,motion_now.arms[i].wrist.z);
-			gl2.glColor3f(0,1,0);
-			gl2.glVertex3f(motion_now.arms[i].elbow.x,motion_now.arms[i].elbow.y,motion_now.arms[i].elbow.z);
-
-			if(draw_shoulder_to_elbow) {
-				gl2.glColor3f(0,1,0);
-				gl2.glVertex3f(motion_now.arms[i].elbow.x,motion_now.arms[i].elbow.y,motion_now.arms[i].elbow.z);
-				gl2.glColor3f(0,0,1);
-				gl2.glVertex3f(motion_now.arms[i].shoulder.x,motion_now.arms[i].shoulder.y,motion_now.arms[i].shoulder.z);
-			}
+			//gl2.glBegin(GL2.GL_LINES);
+			//gl2.glColor3f(1,0,0);
+			//gl2.glVertex3f(motion_now.arms[i].wrist.x,motion_now.arms[i].wrist.y,motion_now.arms[i].wrist.z);
+			//gl2.glColor3f(0,1,0);
+			//gl2.glVertex3f(motion_now.arms[i].elbow.x,motion_now.arms[i].elbow.y,motion_now.arms[i].elbow.z);
+			//gl2.glEnd();
+			tube.SetP1(motion_now.arms[i].wrist);
+			tube.SetP2(motion_now.arms[i].elbow);
+			PrimitiveSolids.drawCylinder(gl2, tube);
 		}
-		gl2.glEnd();
 
+		gl2.glDisable(GL2.GL_LIGHTING);
+		// debug info
 		gl2.glPushMatrix();
 		for(i=0;i<6;++i) {
 			gl2.glColor3f(1,1,1);
 			if(draw_shoulder_star) PrimitiveSolids.drawStar(gl2, motion_now.arms[i].shoulder,5);
 			if(draw_elbow_star) PrimitiveSolids.drawStar(gl2, motion_now.arms[i].elbow,3);			
 			if(draw_wrist_star) PrimitiveSolids.drawStar(gl2, motion_now.arms[i].wrist,1);
+
+			if(draw_shoulder_to_elbow) {
+				gl2.glBegin(GL2.GL_LINES);
+				gl2.glColor3f(0,1,0);
+				gl2.glVertex3f(motion_now.arms[i].elbow.x,motion_now.arms[i].elbow.y,motion_now.arms[i].elbow.z);
+				gl2.glColor3f(0,0,1);
+				gl2.glVertex3f(motion_now.arms[i].shoulder.x,motion_now.arms[i].shoulder.y,motion_now.arms[i].shoulder.z);
+				gl2.glEnd();
+			}
 		}
 		gl2.glPopMatrix();
 		
@@ -975,18 +987,27 @@ extends Robot {
 		//container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 		container.setLayout(new GridLayout(0,1));
 		
-		final JButton home=new JButton("Home");
-        final JButton x=new JButton("X");
-        final JButton y=new JButton("Y");
-        final JButton z=new JButton("Z");
-        container.add(home);
-		container.add(x);
-		container.add(y);
-		container.add(z);
-		home.addActionListener(this);
-        x.addActionListener(this);
-        y.addActionListener(this);
-        z.addActionListener(this);
+		view_home=new JButton("Home");
+		view_px=new JLabelledTextField("","PX");
+		view_py=new JLabelledTextField("","PY");
+		view_pz=new JLabelledTextField("","PZ");
+		view_rx=new JLabelledTextField("","RX");
+		view_ry=new JLabelledTextField("","RY");
+		view_rz=new JLabelledTextField("","RZ");
+        container.add(view_home);
+		container.add(view_px);
+		container.add(view_py);
+		container.add(view_pz);
+		container.add(view_rx);
+		container.add(view_ry);
+		container.add(view_rz);
+		view_home.addActionListener(this);
+		view_px.addActionListener(this);
+		view_py.addActionListener(this);
+        view_pz.addActionListener(this);
+		view_rx.addActionListener(this);
+		view_ry.addActionListener(this);
+        view_rz.addActionListener(this);
         parent.add(container);
 	}
 	
@@ -994,18 +1015,24 @@ extends Robot {
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
 
-		if(subject == home ) {
+		if(subject == view_home ) {
 			JOptionPane.showMessageDialog(null, "Go Home","Click", JOptionPane.INFORMATION_MESSAGE);
 		}
-		if(subject == x ) {
-			JOptionPane.showMessageDialog(null, "Move X","Click", JOptionPane.INFORMATION_MESSAGE);
+		
+		if(subject == view_px ) {
 		}
-		if(subject == y ) {
-			JOptionPane.showMessageDialog(null, "Move Y","Click", JOptionPane.INFORMATION_MESSAGE);
+		if(subject == view_py ) {
 		}
-		if(subject == z ) {
-			JOptionPane.showMessageDialog(null, "Move Z","Click", JOptionPane.INFORMATION_MESSAGE);
+		if(subject == view_pz ) {
 		}
+		
+		if(subject == view_rx ) {
+		}
+		if(subject == view_ry ) {
+		}
+		if(subject == view_rz ) {
+		}
+		
 		super.actionPerformed(e);
 	}
 }

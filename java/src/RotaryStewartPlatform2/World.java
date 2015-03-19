@@ -14,6 +14,7 @@ import RotaryStewartPlatform2.MainGUI;
 import RotaryStewartPlatform2.PrimitiveSolids;
 
 import javax.media.opengl.GL2;
+import javax.media.opengl.glu.GLU;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -26,7 +27,7 @@ implements ActionListener {
 	
 	/* world contents */
 	Camera camera = new Camera();
-	RotaryStewartPlatform robot0 = new RotaryStewartPlatform("0");
+	RotaryStewartPlatform robot0 = new RotaryStewartPlatform("Stewart Platform");
 	
 	final int NUM_ROBOTS = 1;
 	protected int activeRobot=0;
@@ -40,6 +41,9 @@ implements ActionListener {
 		robot1.RotateBase(180f,0f);
 		robot1.FinalizeMove();
 		*/
+		camera.position.set(0,50,-20);
+		camera.pan=0;
+		camera.tilt=80;
 	}
 	
 
@@ -104,44 +108,16 @@ implements ActionListener {
 			//robot1.arduino.DetectSerialPorts();
 			//TODO tell RobotTrainer to update all menus
 			MainGUI.getSingleton().updateMenu();
-			return;
-		}
-		if(subject==buttonDisconnect) {
+		} else if(subject==buttonDisconnect) {
 			robot0.ClosePort();
 			//robot1.arduino.ClosePort();
-			MainGUI.getSingleton().updateMenu();
-			return;
 		}
+		
+		MainGUI.getSingleton().updateMenu();
 	}
 	
     public JMenu updateMenu() {
-    	JMenu menu, subMenu;
-        
-        // connection menu
-        menu = new JMenu("Connection(s)");
-        menu.setMnemonic(KeyEvent.VK_T);
-        menu.getAccessibleContext().setAccessibleDescription("Connection settings.");
-        
-    	subMenu=robot0.getMenu();
-        subMenu.setText("Arm 0");
-        menu.add(subMenu);
-/*
-     	subMenu=robot1.getMenu();
-        subMenu.setText("Arm 1");
-        menu.add(subMenu);
-*/
-        buttonRescan = new JMenuItem("Rescan Ports",KeyEvent.VK_R);
-        buttonRescan.getAccessibleContext().setAccessibleDescription("Rescan the available ports.");
-        buttonRescan.addActionListener(this);
-        menu.add(buttonRescan);
-
-        menu.addSeparator();
-        
-        buttonDisconnect = new JMenuItem("Disconnect",KeyEvent.VK_D);
-        buttonDisconnect.addActionListener(this);
-        menu.add(buttonDisconnect);
-        
-        return menu;
+    	return null;
     }
 
 	protected double t = 0.0;
@@ -161,7 +137,7 @@ implements ActionListener {
 			gl2.glMaterialf(GL2.GL_FRONT, GL2.GL_SHININESS, 100.0f);
 
 			//gl2.glLightfv(GL2.GL_LIGHT0, GL2.GL_EMISSION, new float[] { 0.1f, 0.1f, 0.1f, 1.0f },0);
-		    gl2.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT , new float[] { 0.2f, 0.2f, 0.2f, 1.0f },0);
+		    gl2.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT , new float[] { 0.3f, 0.3f, 0.3f, 1.0f },0);
 		    gl2.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE , new float[] { 0.08f, 0.08f, 0.08f, 1.0f },0);
 		    gl2.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, new float[] { 0.02f, 0.02f, 0.02f, 1.0f },0);
 		    
@@ -181,6 +157,7 @@ implements ActionListener {
 
 
 			gl2.glDisable(GL2.GL_LIGHTING);
+			gl2.glColor3f(0.9f,0.9f,0.9f);
 			PrimitiveSolids.drawGrid(gl2);
 			gl2.glEnable(GL2.GL_LIGHTING);
 
@@ -196,6 +173,21 @@ implements ActionListener {
 			//robot1.render(gl2);
 			
 		gl2.glPopMatrix();
+
+		gl2.glDisable(GL2.GL_DEPTH_TEST);
+		gl2.glDisable(GL2.GL_LIGHTING);
+		gl2.glPushMatrix();
+		gl2.glTranslatef(-MainGUI.getSingleton().getWindowWidth()*0.01f,
+						 -MainGUI.getSingleton().getWindowHeight()*0.01f * MainGUI.getSingleton().getWindowAspectRatio(),
+						 -MainGUI.getSingleton().getWindowWidth()/50.0f
+						 );
+		gl2.glRotatef(camera.tilt, -1, 0, 0);
+		gl2.glRotatef(camera.pan,0,0,1);
+		//gl2.glScalef(20,20,20);
+		PrimitiveSolids.DrawXYZ(gl2);
+		gl2.glPopMatrix();
+		gl2.glEnable(GL2.GL_LIGHTING);
+		gl2.glEnable(GL2.GL_DEPTH_TEST);
 	}
 
 	boolean WillCollide(RotaryStewartPlatform a,RotaryStewartPlatform b) {

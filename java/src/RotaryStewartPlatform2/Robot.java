@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -32,8 +31,9 @@ public class Robot extends SerialConnection implements ActionListener, SerialCon
 	
 	private boolean dialog_result;  // so dialog boxes can return an ok/cancel
 
-	final JButton a=null,b=null,c=null;
-	
+	private JButton connect=null;
+	private JButton disconnect=null;
+	private JButton rescan=null;
 	
 	public boolean IsRunning() { return running; }
 	public boolean IsPaused() { return paused; }
@@ -204,29 +204,51 @@ public class Robot extends SerialConnection implements ActionListener, SerialCon
 		//container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 		container.setLayout(new GridLayout(0,1));
         
-		final JButton a=new JButton("Connect to...");
-        final JButton b=new JButton("Disconnect");
-        final JButton c=new JButton("Rescan");
-        container.add(a);
-		container.add(b);
-		container.add(c);
-        a.addActionListener(this);
-        b.addActionListener(this);
-        c.addActionListener(this);
+		connect=new JButton("Connect to...");
+        disconnect=new JButton("Disconnect");
+        rescan=new JButton("Rescan");
+        container.add(connect);
+		container.add(disconnect);
+		container.add(rescan);
+		connect.addActionListener(this);
+        disconnect.addActionListener(this);
+        rescan.addActionListener(this);
 
         parent.add(container);
 	}
 	
+	public void oldMenu() {/*
+    	JMenu menu, subMenu;
+        
+        // connection menu
+        menu = new JMenu("Connection(s)");
+        menu.setMnemonic(KeyEvent.VK_T);
+        menu.getAccessibleContext().setAccessibleDescription("Connection settings.");
+        
+    	subMenu=robot0.getMenu();
+        menu.add(subMenu);
+        
+        buttonRescan = new JMenuItem("Rescan Ports",KeyEvent.VK_R);
+        buttonRescan.getAccessibleContext().setAccessibleDescription("Rescan the available ports.");
+        buttonRescan.addActionListener(this);
+        menu.add(buttonRescan);
+
+        menu.addSeparator();
+        
+        buttonDisconnect = new JMenuItem("Disconnect",KeyEvent.VK_D);
+        buttonDisconnect.addActionListener(this);
+        menu.add(buttonDisconnect);*/
+	}
 
 	public void actionPerformed(ActionEvent e) {
 		Object subject = e.getSource();
-		if( subject == a ) {
+		if( subject == connect ) {
 			JOptionPane.showMessageDialog(null, "Connect to...","Click", JOptionPane.INFORMATION_MESSAGE);
 		}
-		if( subject == b ) {
+		if( subject == disconnect ) {
 			JOptionPane.showMessageDialog(null, "Disconnect","Click", JOptionPane.INFORMATION_MESSAGE);
 		}
-		if( subject == c ) {
+		if( subject == rescan ) {
 			JOptionPane.showMessageDialog(null, "Rescan","Click", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
