@@ -14,7 +14,6 @@ import RotaryStewartPlatform2.MainGUI;
 import RotaryStewartPlatform2.PrimitiveSolids;
 
 import javax.media.opengl.GL2;
-import javax.media.opengl.glu.GLU;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -41,7 +40,7 @@ implements ActionListener {
 		robot1.RotateBase(180f,0f);
 		robot1.FinalizeMove();
 		*/
-		camera.position.set(0,50,-20);
+		camera.position.set(0,30,-17.5f);
 		camera.pan=0;
 		camera.tilt=80;
 	}
@@ -178,8 +177,8 @@ implements ActionListener {
 		gl2.glDisable(GL2.GL_LIGHTING);
 		gl2.glPushMatrix();
 		gl2.glTranslatef(-MainGUI.getSingleton().getWindowWidth()*0.01f,
-						 -MainGUI.getSingleton().getWindowHeight()*0.01f * MainGUI.getSingleton().getWindowAspectRatio(),
-						 -MainGUI.getSingleton().getWindowWidth()/50.0f
+						 -MainGUI.getSingleton().getWindowHeight()*0.01f,
+						 -MainGUI.getSingleton().getWindowWidth()/50.0f / MainGUI.getSingleton().getWindowAspectRatio()
 						 );
 		gl2.glRotatef(camera.tilt, -1, 0, 0);
 		gl2.glRotatef(camera.pan,0,0,1);

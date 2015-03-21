@@ -2,7 +2,6 @@ package RotaryStewartPlatform2;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.vecmath.Vector3f;
@@ -12,11 +11,14 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 
 
 public class RotaryStewartPlatform 
-extends Robot {
+extends Robot
+implements PropertyChangeListener {
 	//math constants
 	final float RAD2DEG = 180.0f/(float)Math.PI;
 	final float DEG2RAD = (float)Math.PI/180.0f;
@@ -172,7 +174,7 @@ extends Robot {
 		HOME_Z=newhome.z;
 		RotateBase(motion_future,0f,0f);
 		MoveBase(motion_future,new Vector3f(0,0,0));
-		FinalizeMove();
+		moveIfAble();
 	}
 	
 	
@@ -437,17 +439,25 @@ extends Robot {
 	
 	protected void update_ik(float delta) {
 		boolean changed=false;
-		motion_future.finger_tip.set(motion_now.finger_tip);
+		motion_future.set(motion_now);
+		
+		// speeds
 		final float vtranslate=10.0f * delta;
 		final float vrotate=100.0f * delta;
-
-		if (rDown) {	motion_future.finger_tip.x -= vtranslate;	changed=true;		}
-		if (fDown) {	motion_future.finger_tip.x += vtranslate;	changed=true;		}
-		if (tDown) {	motion_future.finger_tip.y += vtranslate;	changed=true;		}
-		if (gDown) {	motion_future.finger_tip.y -= vtranslate;	changed=true;		}
-		if (yDown) {	motion_future.finger_tip.z += vtranslate;	changed=true;		}
-		if (hDown) {	motion_future.finger_tip.z -= vtranslate;	changed=true;		}
-
+		
+		// lateral moves
+		if (rDown) {	motion_future.finger_tip.x -= vtranslate;	}
+		if (fDown) {	motion_future.finger_tip.x += vtranslate;	}
+		if (tDown) {	motion_future.finger_tip.y += vtranslate;	}
+		if (gDown) {	motion_future.finger_tip.y -= vtranslate;	}
+		if (yDown) {	motion_future.finger_tip.z += vtranslate;	}
+		if (hDown) {	motion_future.finger_tip.z -= vtranslate;	}
+		if(!motion_now.finger_tip.epsilonEquals(motion_future.finger_tip,vtranslate/2.0f)) 
+		{
+			changed=true;
+		}
+		
+		// rotation
 		float ru=0,rv=0,rw=0;
 		if(uDown) rw= 0.1f;
 		if(jDown) rw=-0.1f;
@@ -458,45 +468,54 @@ extends Robot {
 
 		if(rw!=0 || rv!=0 || ru!=0 )
 		{
-			// On a 3-axis robot when homed the forward axis of the finger tip is pointing downward.
-			// More complex arms start from the same assumption.
-			Vector3f forward = new Vector3f(HOME_FORWARD_X,HOME_FORWARD_Y,HOME_FORWARD_Z);
-			Vector3f right = new Vector3f(HOME_RIGHT_X,HOME_RIGHT_Y,HOME_RIGHT_Z);
-			Vector3f up = new Vector3f();
-			
-			up.cross(forward,right);
-			
-			Vector3f of = new Vector3f(forward);
-			Vector3f or = new Vector3f(right);
-			Vector3f ou = new Vector3f(up);
-			
 			motion_future.iku+=ru*vrotate;
 			motion_future.ikv+=rv*vrotate;
 			motion_future.ikw+=rw*vrotate;
 			
-			Vector3f result;
-
-			result = RotateAroundAxis(forward,of,motion_future.iku*DEG2RAD);  // TODO rotating around itself has no effect.
-			result = RotateAroundAxis(result,or,motion_future.ikv*DEG2RAD);
-			result = RotateAroundAxis(result,ou,motion_future.ikw*DEG2RAD);
-			motion_future.finger_forward.set(result);
-
-			result = RotateAroundAxis(right,of,motion_future.iku*DEG2RAD);
-			result = RotateAroundAxis(result,or,motion_future.ikv*DEG2RAD);
-			result = RotateAroundAxis(result,ou,motion_future.ikw*DEG2RAD);
-			motion_future.finger_left.set(result);
-			
-			motion_future.finger_up.cross(motion_future.finger_forward,motion_future.finger_left);
 			changed=true;
 		}
 
-		if(changed==true && movePermitted(motion_future)) {
-			if(motion_now.finger_tip.epsilonEquals(motion_future.finger_tip,0.1f)) {
-				arm_moved=true;
-			}
+		if(changed==true) {
+			moveIfAble();
+		}
+	}
+	
+	public void moveIfAble() {
+		RotateFinger();	
+		
+		if(movePermitted(motion_future)) {
+			arm_moved=true;
+			FinalizeMove();
 		} else {
 			motion_future.set(motion_now);
 		}
+	}
+	
+	
+	public void RotateFinger() {
+		Vector3f forward = new Vector3f(HOME_FORWARD_X,HOME_FORWARD_Y,HOME_FORWARD_Z);
+		Vector3f right = new Vector3f(HOME_RIGHT_X,HOME_RIGHT_Y,HOME_RIGHT_Z);
+		Vector3f up = new Vector3f();
+		
+		up.cross(forward,right);
+		
+		Vector3f of = new Vector3f(forward);
+		Vector3f or = new Vector3f(right);
+		Vector3f ou = new Vector3f(up);
+		
+		Vector3f result;
+
+		result = RotateAroundAxis(forward,of,motion_future.iku*DEG2RAD);  // TODO rotating around itself has no effect.
+		result = RotateAroundAxis(result,or,motion_future.ikv*DEG2RAD);
+		result = RotateAroundAxis(result,ou,motion_future.ikw*DEG2RAD);
+		motion_future.finger_forward.set(result);
+
+		result = RotateAroundAxis(right,of,motion_future.iku*DEG2RAD);
+		result = RotateAroundAxis(result,or,motion_future.ikv*DEG2RAD);
+		result = RotateAroundAxis(result,ou,motion_future.ikw*DEG2RAD);
+		motion_future.finger_left.set(result);
+		
+		motion_future.finger_up.cross(motion_future.finger_forward,motion_future.finger_left);
 	}
 	
 		
@@ -685,6 +704,17 @@ extends Robot {
 						          +" W"+motion_now.ikw
 						          );
 			}
+			
+			// TODO: update text fields when the cursor moves.  right now this causes inter-thread damage and crashes the app
+			/*
+			if(view_px!=null) {	        
+				view_px.getField().setText(Float.toString(motion_now.finger_tip.x));
+				view_py.getField().setText(Float.toString(motion_now.finger_tip.y));
+				view_pz.getField().setText(Float.toString(motion_now.finger_tip.z));
+				view_rx.getField().setText(Float.toString(motion_now.iku));
+				view_ry.getField().setText(Float.toString(motion_now.ikv));
+				view_rz.getField().setText(Float.toString(motion_now.ikw));
+			}*/
 		}
 	}
 	
@@ -988,12 +1018,12 @@ extends Robot {
 		container.setLayout(new GridLayout(0,1));
 		
 		view_home=new JButton("Home");
-		view_px=new JLabelledTextField("","PX");
-		view_py=new JLabelledTextField("","PY");
-		view_pz=new JLabelledTextField("","PZ");
-		view_rx=new JLabelledTextField("","RX");
-		view_ry=new JLabelledTextField("","RY");
-		view_rz=new JLabelledTextField("","RZ");
+		view_px=new JLabelledTextField(Float.toString(motion_now.finger_tip.x),"X");
+		view_py=new JLabelledTextField(Float.toString(motion_now.finger_tip.y),"Y");
+		view_pz=new JLabelledTextField(Float.toString(motion_now.finger_tip.z),"Z");
+		view_rx=new JLabelledTextField(Float.toString(motion_now.iku),"U");
+		view_ry=new JLabelledTextField(Float.toString(motion_now.ikv),"V");
+		view_rz=new JLabelledTextField(Float.toString(motion_now.ikw),"W");
         container.add(view_home);
 		container.add(view_px);
 		container.add(view_py);
@@ -1002,12 +1032,12 @@ extends Robot {
 		container.add(view_ry);
 		container.add(view_rz);
 		view_home.addActionListener(this);
-		view_px.addActionListener(this);
-		view_py.addActionListener(this);
-        view_pz.addActionListener(this);
-		view_rx.addActionListener(this);
-		view_ry.addActionListener(this);
-        view_rz.addActionListener(this);
+		view_px.addPropertyChangeListener("value",this);
+		view_py.addPropertyChangeListener("value",this);
+		view_pz.addPropertyChangeListener("value",this);
+		view_rx.addPropertyChangeListener("value",this);
+		view_ry.addPropertyChangeListener("value",this);
+		view_rz.addPropertyChangeListener("value",this);
         parent.add(container);
 	}
 	
@@ -1019,20 +1049,63 @@ extends Robot {
 			JOptionPane.showMessageDialog(null, "Go Home","Click", JOptionPane.INFORMATION_MESSAGE);
 		}
 		
-		if(subject == view_px ) {
-		}
-		if(subject == view_py ) {
-		}
-		if(subject == view_pz ) {
-		}
-		
-		if(subject == view_rx ) {
-		}
-		if(subject == view_ry ) {
-		}
-		if(subject == view_rz ) {
-		}
 		
 		super.actionPerformed(e);
+	}
+	
+	public void propertyChange(PropertyChangeEvent e) {
+		Object subject = e.getSource();
+
+		try {
+			if(subject == view_px ) {
+				String t=view_px.getField().getText();
+				float f = Float.parseFloat(t);
+				if(!Float.isNaN(f)) {
+					this.motion_future.finger_tip.x = f;
+					moveIfAble();
+				}
+			}
+			if(subject == view_py ) {
+				String t=view_py.getField().getText();
+				float f = Float.parseFloat(t);
+				if(!Float.isNaN(f)) {
+					this.motion_future.finger_tip.y = f;
+					moveIfAble();
+				}
+			}
+			if(subject == view_pz ) {
+				String t=view_pz.getField().getText();
+				float f = Float.parseFloat(t);
+				if(!Float.isNaN(f)) {
+					this.motion_future.finger_tip.z = f;
+					moveIfAble();
+				}
+			}
+			
+			if(subject == view_rx ) {
+				String t=view_rx.getField().getText();
+				float f = Float.parseFloat(t);
+				if(!Float.isNaN(f)) {
+					this.motion_future.iku = f;
+					moveIfAble();
+				}
+			}
+			if(subject == view_ry ) {
+				String t=view_ry.getField().getText();
+				float f = Float.parseFloat(t);
+				if(!Float.isNaN(f)) {
+					this.motion_future.ikv = f;
+					moveIfAble();
+				}
+			}
+			if(subject == view_rz ) {
+				String t=view_rz.getField().getText();
+				float f = Float.parseFloat(t);
+				if(!Float.isNaN(f)) {
+					this.motion_future.ikw = f;
+					moveIfAble();
+				}
+			}		
+		} catch(NumberFormatException e2) {}
 	}
 }

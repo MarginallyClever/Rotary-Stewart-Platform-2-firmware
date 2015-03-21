@@ -1,13 +1,16 @@
 package RotaryStewartPlatform2;
 
 import java.awt.FlowLayout;
+import java.awt.event.ActionListener;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
-public class JLabelledTextField extends JPanel {
+
+public class JLabelledTextField extends JPanel implements DocumentListener {
 	/**
 	 * 
 	 */
@@ -17,15 +20,43 @@ public class JLabelledTextField extends JPanel {
 	
 	JLabelledTextField(String value_text,String label_text) {
 		label = new JLabel(label_text);
-		field = new JTextField(value_text);
+		field = new JTextField(value_text,10);
 
-		JPanel margin = new JPanel();
-        this.add(margin);
-        margin.setBorder(new EmptyBorder(5, 5, 5, 5));
-		JPanel container = new JPanel();
-		container.setLayout(new FlowLayout());
-		margin.add(container);
-		container.add(label);
-		container.add(field);
+		JPanel p = this;
+
+		//JPanel margin = new JPanel();
+        //p.add(margin);
+		//p=margin;
+        //margin.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		//JPanel container = new JPanel();
+		//p.add(container);
+		//p=container;
+		
+		p.setLayout(new FlowLayout());
+		p.add(label);
+		p.add(field); 
+		
+		field.getDocument().addDocumentListener(this);
+	}
+	
+	public JTextField getField() { return field; }
+	
+	public void addActionListener(ActionListener L) {
+		field.addActionListener(L);
+	}
+	
+	public void changedUpdate(DocumentEvent e) {
+		changeNow(e);
+	}
+	public void removeUpdate(DocumentEvent e) {
+		changeNow(e);
+	}
+	public void insertUpdate(DocumentEvent e) {
+		changeNow(e);
+	}
+	
+	public void changeNow(DocumentEvent e) {
+		this.firePropertyChange("value",null,field.getText());
 	}
 }

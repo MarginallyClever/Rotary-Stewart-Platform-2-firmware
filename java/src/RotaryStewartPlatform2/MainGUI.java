@@ -189,7 +189,7 @@ implements ActionListener, GLEventListener, MouseListener, MouseMotionListener, 
                 //System.out.println("Focus LOST:"+e);
 
                 // FIX FOR GNOME/XWIN FOCUS BUG
-                e.getComponent().requestFocus();
+                //e.getComponent().requestFocus();
             }
         });
 		
