@@ -19,7 +19,7 @@ public class JLabelledTextField extends JPanel implements DocumentListener {
 	private JTextField field;
 	
 	JLabelledTextField(String value_text,String label_text) {
-		label = new JLabel(label_text);
+		label = new JLabel(label_text,JLabel.TRAILING);
 		field = new JTextField(value_text,10);
 
 		JPanel p = this;

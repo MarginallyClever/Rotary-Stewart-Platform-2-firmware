@@ -27,6 +27,7 @@ import java.util.jar.JarFile;
 */
 import java.util.prefs.Preferences;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -168,8 +169,23 @@ implements ActionListener, GLEventListener, MouseListener, MouseMotionListener, 
         world.addCSGUI(contextPanel);
 
         
+        
+        JPanel driveButtons = new JPanel();
+        driveButtons.setLayout(new GridLayout(10,1));
+        driveButtons.add(new JButton("Left"));
+        driveButtons.add(new JButton("Right"));
+        driveButtons.add(new JButton("Up"));
+        driveButtons.add(new JButton("Down"));
+        driveButtons.add(new JButton("Forward"));
+        driveButtons.add(new JButton("Backward"));
+
+        JPanel view3d = new JPanel();
+        view3d.setLayout(new BorderLayout());
+        view3d.add(driveButtons,BorderLayout.LINE_START);
+        view3d.add(glcanvas,BorderLayout.CENTER);
+        
         splitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        splitter.add(glcanvas);
+        splitter.add(view3d);
         splitter.add(contextPanel);
 		splitter.setResizeWeight(0.9);
 		splitter.setDividerLocation(0.9);

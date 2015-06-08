@@ -394,10 +394,13 @@ ISR(TIMER1_COMPA_vect) {
         over[5] -= steps_total;
         digitalWrite(MOTOR_5_STEP_PIN,HIGH);
       }
+      
+      // make a step
+      steps_taken++;
+      
+      if(steps_taken >= steps_total) break;
     }
     
-    // make a step
-    steps_taken++;
 
     // accel
     float nfr=current_feed_rate;
