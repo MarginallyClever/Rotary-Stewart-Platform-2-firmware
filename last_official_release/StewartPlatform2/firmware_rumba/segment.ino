@@ -21,7 +21,8 @@ Segment line_segments[MAX_SEGMENTS];
 Segment *working_seg = NULL;
 volatile int current_segment=0;
 volatile int last_segment=0;
-int step_multiplier;
+int step_multiplier, nominal_step_multiplier;
+unsigned short nominal_OCR1A;
 
 // used by timer1 to optimize interrupt inner loop
 int delta[NUM_AXIES];
@@ -31,6 +32,8 @@ int steps_taken;
 int accel_until,decel_after;
 long current_feed_rate;
 long old_feed_rate=0;
+long start_feed_rate,end_feed_rate;
+long time_accelerating,time_decelerating;
 
 
 //------------------------------------------------------------------------------
@@ -276,10 +279,9 @@ void recalculate_acceleration() {
  * Set the clock 1 timer frequency.
  * @input desired_freq_hz the desired frequency
  */
-FORCE_INLINE void timer_set_frequency(long desired_freq_hz) {
+FORCE_INLINE unsigned short calc_timer(long desired_freq_hz) {
   if( desired_freq_hz > MAX_FEEDRATE ) desired_freq_hz = MAX_FEEDRATE;
   if( desired_freq_hz < MIN_FEEDRATE ) desired_freq_hz = MIN_FEEDRATE;
-  if( old_feed_rate == desired_freq_hz ) return;
   old_feed_rate = desired_freq_hz;
   
   // Source: https://github.com/MarginallyClever/ArduinoTimerInterrupt
@@ -305,7 +307,7 @@ FORCE_INLINE void timer_set_frequency(long desired_freq_hz) {
     counter_value = 100;
   }
 
-  OCR1A = counter_value;
+  return counter_value;
 }
 
 
@@ -327,8 +329,15 @@ ISR(TIMER1_COMPA_vect) {
       digitalWrite( MOTOR_5_DIR_PIN, working_seg->a[5].dir );
       
       // set frequency to segment feed rate
-      timer_set_frequency(working_seg->feed_rate_start);
-      current_feed_rate = working_seg->feed_rate_start;
+      nominal_OCR1A = calc_timer(working_seg->feed_rate_max);
+      nominal_step_multiplier = step_multiplier;
+      
+      start_feed_rate = working_seg->feed_rate_start;
+      end_feed_rate = working_seg->feed_rate_end;
+      current_feed_rate = start_feed_rate;
+      time_decelerating = 0;
+      time_accelerating = calc_timer(start_feed_rate);
+      OCR1A = time_accelerating;
       
       // defererencing some data so the loop runs faster.
       steps_total=working_seg->steps_total;
@@ -345,7 +354,6 @@ ISR(TIMER1_COMPA_vect) {
       return;
     } else {
       OCR1A = 2000; // wait 1ms
-      return;
     }
   }
   
@@ -403,19 +411,23 @@ ISR(TIMER1_COMPA_vect) {
     
 
     // accel
-    float nfr=current_feed_rate;
+    unsigned short t;
     if( steps_taken <= accel_until ) {
-      nfr-=acceleration;
-      if(nfr<MIN_FEEDRATE) nfr = MIN_FEEDRATE;
+      current_feed_rate = (acceleration * time_accelerating / 1000000);
+      current_feed_rate += start_feed_rate;
+      t = calc_timer(current_feed_rate);
+      OCR1A = t;
+      time_accelerating+=t;
     } else if( steps_taken > decel_after ) {
-      nfr+=acceleration;
-      if(nfr>MAX_FEEDRATE) nfr = MAX_FEEDRATE;
+      unsigned short step_time = (acceleration * time_decelerating / 1000000);
+      long end_feed_rate = current_feed_rate - step_time;
+      t = calc_timer(end_feed_rate);
+      OCR1A = t;
+      time_decelerating+=t;
+    } else {
+      OCR1A = nominal_OCR1A;
+      step_multiplier = nominal_step_multiplier;
     }
-    
-    if(nfr!=current_feed_rate) {
-      current_feed_rate=nfr;
-      timer_set_frequency(current_feed_rate);
-    }      
 
     // Is this segment done?
     if( steps_taken >= steps_total ) {

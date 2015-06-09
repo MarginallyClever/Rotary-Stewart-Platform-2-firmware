@@ -25,12 +25,12 @@
 #define MAX_FEEDRATE         (40000.0)  // depends on timer interrupt & hardware
 #define MIN_FEEDRATE         (500)
 #define DEFAULT_FEEDRATE     (3000.0)
-#define DEFAULT_ACCELERATION (5)
+#define DEFAULT_ACCELERATION (1000)
 
 #define NUM_AXIES            (6)
 
 // related to number of instructions that can be buffered.  must be a power of two > 1.
-#define MAX_SEGMENTS         (64)  // must be a power of 2
+#define MAX_SEGMENTS         (32)  // must be a power of 2
 // for splitting lines and look-ahead
 #define MM_PER_SEGMENT       (3)
 
