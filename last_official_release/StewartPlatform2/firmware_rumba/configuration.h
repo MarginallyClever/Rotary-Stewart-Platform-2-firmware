@@ -14,19 +14,23 @@
 #define VERBOSE              (0)  // increase this number to get more output
 //#define DEBUG_SWITCHES       (1)
 
-#define EEPROM_VERSION       (1)  // firmware version
-
+// Comms
 #define BAUD                 (57600)  // How fast is the Arduino talking?
 #define MAX_BUF              (64)  // What is the longest message we can store?
 
+// Stepper motors
 #define STEPS_PER_TURN       (400)  // depends on your stepper motor.  most are 200.
 #define MICROSTEPS           (16.0)
+#define MICROSTEPS_PER_TURN  (STEPS_PER_TURN*MICROSTEPS)
+#define MICROSTEP_PER_DEGREE (MICROSTEPS_PER_TURN/360.0)
 
+// speed and acceleration
 #define MAX_FEEDRATE         (40000.0)  // depends on timer interrupt & hardware
 #define MIN_FEEDRATE         (500)
 #define DEFAULT_FEEDRATE     (3000.0)
 #define DEFAULT_ACCELERATION (1000)
 
+// misc
 #define NUM_AXIES            (6)
 
 // related to number of instructions that can be buffered.  must be a power of two > 1.
@@ -39,10 +43,11 @@
 #define DEG2RAD              (PI/180.0)
 #define RAD2DEG              (180.0/PI)
 
-#define MICROSTEPS_PER_TURN  (STEPS_PER_TURN*MICROSTEPS)
-#define MICROSTEP_PER_DEGREE (MICROSTEPS_PER_TURN/360.0)
 
 
+//------------------------------------------------------------------------------
+// TIMER 
+//------------------------------------------------------------------------------
 // time passed with no instruction?  Make sure PC knows we are waiting.
 #define TIMEOUT_OK           (1000)
 // timing
@@ -60,7 +65,9 @@
 
 
 
+//------------------------------------------------------------------------------
 // hardware/software pins
+//------------------------------------------------------------------------------
 #define MOTOR_0_DIR_PIN    (16)
 #define MOTOR_0_STEP_PIN   (17)
 #define MOTOR_0_ENABLE_PIN (48)
@@ -90,6 +97,21 @@
 #define MOTOR_5_STEP_PIN   (29)
 #define MOTOR_5_ENABLE_PIN (39)
 #define MOTOR_5_LIMIT_PIN  (32)
+
+
+//------------------------------------------------------------------------------
+// EEPROM MEMORY MAP
+//------------------------------------------------------------------------------
+#define EEPROM_VERSION   1                         // Increment EEPROM_VERSION when adding new variables
+
+#define ADDR_VERSION     0                         // address of the version number (one byte)
+#define ADDR_GUID        (ADDR_VERSION+1)          // address of the UUID (long - 4 bytes)
+// sensor adjustments
+
+//------------------------------------------------------------------------------
+// GLOBALS
+//------------------------------------------------------------------------------
+extern long robot_uid;
 
 
 /**

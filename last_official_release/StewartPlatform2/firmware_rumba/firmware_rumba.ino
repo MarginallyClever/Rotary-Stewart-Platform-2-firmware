@@ -25,6 +25,8 @@ float acceleration=DEFAULT_ACCELERATION;
 // settings
 char mode_abs=1;  // absolute mode?
 
+// misc
+long robot_uid=0;
 
 //------------------------------------------------------------------------------
 // METHODS
@@ -79,8 +81,10 @@ float feedrate(float nfr) {
  * display helpful information
  */
 void help() {
-  Serial.print(F("StewartPlatform v4-2"));
+  Serial.print(F("\n\nHELLO WORLD! I AM STEWART PLATFORM V4.2"));
   Serial.println(EEPROM_VERSION);
+  Serial.print(F(" #"));
+  Serial.println(robot_uid);
   Serial.println(F("Commands:"));
   Serial.println(F("M17/M18; - enable/disable motors"));
   Serial.println(F("M100; - this help message"));
@@ -96,6 +100,7 @@ void help() {
 void setup() {
   Serial.begin(BAUD);  // open coms
 
+  loadConfig();
   motor_setup();
   segment_setup();
   

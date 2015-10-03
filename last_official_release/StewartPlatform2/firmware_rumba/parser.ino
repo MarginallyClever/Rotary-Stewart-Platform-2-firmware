@@ -100,6 +100,11 @@ void parser_processCommand() {
     line_number++;
   }
   
+  if(!strncmp(buffer,"UID",3) && robot_uid==0) {
+    robot_uid=atoi(strchr(buffer,' ')+1);
+    saveUID();
+  }
+  
   cmd = parsenumber('G',-1);
   switch(cmd) {
   case  0: 
