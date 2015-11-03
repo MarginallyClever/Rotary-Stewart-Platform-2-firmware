@@ -98,9 +98,10 @@ void help() {
  * First thing this machine does on startup.  Runs only once.
  */
 void setup() {
+  loadConfig();
+  
   Serial.begin(BAUD);  // open coms
 
-  loadConfig();
   motor_setup();
   segment_setup();
   

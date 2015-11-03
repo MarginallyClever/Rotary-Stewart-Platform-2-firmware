@@ -263,7 +263,7 @@ void hexapod_update_shoulder_angles() {
 
 
 /**
- * Uses bresenham's line algorithm to move both motors
+ * Uses bresenham's line algorithm to move motors
  * @input newx the destination x position
  * @input newy the destination y position
  **/
@@ -297,15 +297,23 @@ void robot_line(float newx,float newy,float newz,float newu,float newv,float new
 
   int i;
   float f;
-  for(i=1;i<=pieces;++i) {
+  for(i=1;i<pieces;++i) {
     f = (float)i / (float)pieces;
     ipos = startpos + dpos*f;
     irpy = startrpy + drpy*f;
     
     update_ik(ipos,irpy);
-
     motor_segment(new_feed_rate);
   }
+  
+  update_ik(endpos,endrpy);
+  motor_segment(new_feed_rate);
+  
+  // remember the new position.
+  robot.ee.pos = endpos;
+  robot.ee.r = endrpy.x;
+  robot.ee.p = endrpy.y;
+  robot.ee.y = endrpy.z;  
 }
 
 
