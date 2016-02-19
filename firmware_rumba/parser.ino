@@ -186,7 +186,7 @@ void parser_processCommand() {
  */
 void parser_ready() {
   sofar=0;  // clear input buffer
-  Serial.print(F(">"));  // signal ready to receive input
+  Serial.print(F("\n>"));  // signal ready to receive input
   last_cmd_time = millis();
 }
 

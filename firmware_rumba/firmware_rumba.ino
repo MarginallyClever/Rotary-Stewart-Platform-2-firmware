@@ -82,9 +82,10 @@ float feedrate(float nfr) {
  */
 void help() {
   Serial.print(F("\n\nHELLO WORLD! I AM STEWART PLATFORM V4.2"));
-  Serial.println(EEPROM_VERSION);
+  Serial.print(EEPROM_VERSION);
   Serial.print(F(" #"));
   Serial.println(robot_uid);
+  Serial.println(F("Please see http://www.marginallyclever.com/ for more information."));
   Serial.println(F("Commands:"));
   Serial.println(F("M17/M18; - enable/disable motors"));
   Serial.println(F("M100; - this help message"));
