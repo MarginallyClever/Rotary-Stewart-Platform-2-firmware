@@ -12,7 +12,7 @@
 // CONSTANTS
 //------------------------------------------------------------------------------
 #define VERBOSE              (0)  // increase this number to get more output
-//#define DEBUG_SWITCHES       (1)
+#define DEBUG_SWITCHES       (0)
 
 // Comms
 #define BAUD                 (57600)  // How fast is the Arduino talking?
@@ -28,7 +28,7 @@
 #define MAX_FEEDRATE         (40000.0)  // depends on timer interrupt & hardware
 #define MIN_FEEDRATE         (500)
 #define DEFAULT_FEEDRATE     (3000.0)
-#define DEFAULT_ACCELERATION (1000)
+#define DEFAULT_ACCELERATION (50.0)
 
 // misc
 #define NUM_AXIES            (6)

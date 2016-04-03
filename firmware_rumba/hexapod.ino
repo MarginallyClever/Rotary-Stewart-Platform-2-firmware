@@ -354,20 +354,20 @@ char hexapod_read_switches() {
   
   for(i=0;i<6;++i) {
     state=digitalRead(robot.arms[i].limit_switch_pin);
-#ifdef DEBUG_SWITCHES
+#ifdef DEBUG_SWITCHES > 0
     Serial.print(state);
     Serial.print('\t');
 #endif
     if(robot.arms[i].limit_switch_state != state) {
       robot.arms[i].limit_switch_state = state;
-#ifdef DEBUG_SWITCHES
+#ifdef DEBUG_SWITCHES > 0
       Serial.print(F("Switch "));
       Serial.println(i,DEC);
 #endif
     }
     if(state == LOW) ++hit;
   }
-#ifdef DEBUG_SWITCHES
+#ifdef DEBUG_SWITCHES > 0
   Serial.print('\n');
 #endif
   return hit;
@@ -381,7 +381,7 @@ char hexapod_read_switches() {
  **/
 void hexapod_onestep(int motor,int dir) {
 #if VERBOSE > 0
-  Serial.print(letter[motor]);
+  Serial.print('A'+motor);
 #endif
   Arm &a = robot.arms[motor];
   dir *= a.motor_scale;
@@ -423,7 +423,7 @@ void robot_find_home() {
   Serial.println(F("Homing..."));
 #if VERBOSE > 0
   Serial.print("steps=");
-  Serial.println(step_size);
+  Serial.println(steps_to_zero);
 #endif
 
   for(;steps_to_zero>0;--steps_to_zero) {
