@@ -49,6 +49,33 @@ void hexapod_setup() {
   robot_position(0,0,0,0,0,0);
 }
 
+void hexapod_setupAnglesFirstTime() {
+  robot.steps_to_zero[0]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE1;
+  robot.steps_to_zero[1]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE2;
+  robot.steps_to_zero[2]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE3;
+  robot.steps_to_zero[3]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE4;
+  robot.steps_to_zero[4]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE5;
+  robot.steps_to_zero[5]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE6;
+}
+
+
+void hexapod_loadHomeAngles() {
+  robot.steps_to_zero[0] = EEPROM_readFloat(ADDR_ANGLE1);
+  robot.steps_to_zero[1] = EEPROM_readFloat(ADDR_ANGLE2);
+  robot.steps_to_zero[2] = EEPROM_readFloat(ADDR_ANGLE3);
+  robot.steps_to_zero[3] = EEPROM_readFloat(ADDR_ANGLE4);
+  robot.steps_to_zero[4] = EEPROM_readFloat(ADDR_ANGLE5);
+  robot.steps_to_zero[5] = EEPROM_readFloat(ADDR_ANGLE6);
+}
+
+void hexapod_writeAnglesToEEPROM() {
+  robot.steps_to_zero[0]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE1;
+  robot.steps_to_zero[1]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE2;
+  robot.steps_to_zero[2]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE3;
+  robot.steps_to_zero[3]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE4;
+  robot.steps_to_zero[4]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE5;
+  robot.steps_to_zero[5]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE6;
+}
 
 /**
  * Build a virtual model of the hexapod shoulders for calculating angles later.
@@ -418,21 +445,26 @@ void robot_find_home() {
 
   // The arms are 19.69 degrees from straight down when they hit the switcrobot.
   // @TODO: This could be better customized in firmware.
-  float horizontal = 90.00 - SWITCH_ANGLE;
-  long steps_to_zero = MICROSTEP_PER_DEGREE * horizontal;
+  hexapod_loadHomeAngles();
+  
   Serial.println(F("Homing..."));
 #if VERBOSE > 0
   Serial.print("steps=");
   Serial.println(steps_to_zero);
 #endif
-
-  for(;steps_to_zero>0;--steps_to_zero) {
-    for(i=0;i<6;++i) {
-      hexapod_onestep(i,1);
+  char keepGoing;
+  do {
+    for(i=0;i<NUM_AXIES;++i) {
+      keepGoing=0;
+      if(robot.steps_to_zero[i]>0) {
+        --robot.steps_to_zero[i];
+        hexapod_onestep(i,1);
+        keepGoing=1;
+      }
     }
     pause(250);
-  }
-  
+  } while(keepGoing>0);
+    
   // recalculate XYZ positions
   hexapod_setup();
 }

@@ -22,7 +22,16 @@
 #define NUM_TOOLS            (6)
 #define BICEP_LENGTH         ( 5.000)
 #define FOREARM_LENGTH       (16.750)
-#define SWITCH_ANGLE         (19.690)
+
+// individually correct each switch for best calibration.
+// default value taken from the 3D model.
+#define SWITCH_ANGLE1        (18.690)
+#define SWITCH_ANGLE2        (18.690)
+#define SWITCH_ANGLE3        (18.690)
+#define SWITCH_ANGLE4        (18.690)
+#define SWITCH_ANGLE5        (18.690)
+#define SWITCH_ANGLE6        (18.690)
+
 // top center to wrist hole (relative): X7.635 Y+/-0.553 Z0.87
 #define T2W_X                ( 7.635)
 #define T2W_Y                ( 0.553)
@@ -75,6 +84,8 @@ struct Hexapod {
   
   Vector3 v;  // max XYZ vel
   Vector3 destination;  // target XYZ position
+  
+  long steps_to_zero[NUM_AXIES];
 };
 
 

@@ -102,11 +102,19 @@
 //------------------------------------------------------------------------------
 // EEPROM MEMORY MAP
 //------------------------------------------------------------------------------
-#define EEPROM_VERSION   1                         // Increment EEPROM_VERSION when adding new variables
+#define EEPROM_VERSION   2                         // Increment EEPROM_VERSION when adding new variables
 
 #define ADDR_VERSION     0                         // address of the version number (one byte)
 #define ADDR_GUID        (ADDR_VERSION+1)          // address of the UUID (long - 4 bytes)
+
 // sensor adjustments
+#define ADDR_ANGLE1      (ADDR_GUID  +4)
+#define ADDR_ANGLE2      (ADDR_ANGLE1+4)
+#define ADDR_ANGLE3      (ADDR_ANGLE2+4)
+#define ADDR_ANGLE4      (ADDR_ANGLE3+4)
+#define ADDR_ANGLE5      (ADDR_ANGLE4+4)
+#define ADDR_ANGLE6      (ADDR_ANGLE5+4)
+
 
 //------------------------------------------------------------------------------
 // GLOBALS

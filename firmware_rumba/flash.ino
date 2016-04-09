@@ -53,7 +53,6 @@ float EEPROM_readFloat(int ee) {
 //------------------------------------------------------------------------------
 void loadConfig() {
   char version_number=EEPROM.read(ADDR_VERSION);
-  
   if(version_number!=EEPROM_VERSION) {
     // If not the current EEPROM_VERSION or the EEPROM_VERSION is sullied (i.e. unknown data)
     // Update the version number
@@ -64,6 +63,9 @@ void loadConfig() {
       // Update robot uuid
       robot_uid=0;
       saveUID();
+    } else if(version_number==1) {
+      hexapod_setupAnglesFirstTime();
+      hexapod_writeAnglesToEEPROM();
     } else {
       // Code should not get here if it does we should display some meaningful error message
       Serial.println(F("An Error Occurred during LoadConfig"));
@@ -71,14 +73,16 @@ void loadConfig() {
   }
 
   robot_uid = EEPROM_readLong(ADDR_GUID);
+  
   Serial.println(F("Calibration loaded."));
 }
 
 
 /**
- * Save the sensor adjustments (calibration offsets)
+ * Save calibration tweaks
  */
 void saveAdjustments() {
+  hexapod_writeAnglesToEEPROM();
 }
 
 
