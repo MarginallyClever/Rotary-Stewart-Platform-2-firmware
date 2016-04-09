@@ -47,6 +47,7 @@ void hexapod_setup() {
 
   update_ik(zero,zero);
   robot_position(0,0,0,0,0,0);
+  hexapod_loadHomeAngles();
 }
 
 void hexapod_setupAnglesFirstTime() {
@@ -60,21 +61,21 @@ void hexapod_setupAnglesFirstTime() {
 
 
 void hexapod_loadHomeAngles() {
-  robot.steps_to_zero[0] = EEPROM_readFloat(ADDR_ANGLE1);
-  robot.steps_to_zero[1] = EEPROM_readFloat(ADDR_ANGLE2);
-  robot.steps_to_zero[2] = EEPROM_readFloat(ADDR_ANGLE3);
-  robot.steps_to_zero[3] = EEPROM_readFloat(ADDR_ANGLE4);
-  robot.steps_to_zero[4] = EEPROM_readFloat(ADDR_ANGLE5);
-  robot.steps_to_zero[5] = EEPROM_readFloat(ADDR_ANGLE6);
+  robot.steps_to_zero[0] = EEPROM_readLong(ADDR_ANGLE1);
+  robot.steps_to_zero[1] = EEPROM_readLong(ADDR_ANGLE2);
+  robot.steps_to_zero[2] = EEPROM_readLong(ADDR_ANGLE3);
+  robot.steps_to_zero[3] = EEPROM_readLong(ADDR_ANGLE4);
+  robot.steps_to_zero[4] = EEPROM_readLong(ADDR_ANGLE5);
+  robot.steps_to_zero[5] = EEPROM_readLong(ADDR_ANGLE6);
 }
 
 void hexapod_writeAnglesToEEPROM() {
-  robot.steps_to_zero[0]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE1;
-  robot.steps_to_zero[1]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE2;
-  robot.steps_to_zero[2]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE3;
-  robot.steps_to_zero[3]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE4;
-  robot.steps_to_zero[4]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE5;
-  robot.steps_to_zero[5]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE6;
+  EEPROM_writeLong(ADDR_ANGLE1,robot.steps_to_zero[0]);
+  EEPROM_writeLong(ADDR_ANGLE2,robot.steps_to_zero[1]);
+  EEPROM_writeLong(ADDR_ANGLE3,robot.steps_to_zero[2]);
+  EEPROM_writeLong(ADDR_ANGLE4,robot.steps_to_zero[3]);
+  EEPROM_writeLong(ADDR_ANGLE5,robot.steps_to_zero[4]);
+  EEPROM_writeLong(ADDR_ANGLE6,robot.steps_to_zero[5]);
 }
 
 /**
@@ -467,6 +468,7 @@ void robot_find_home() {
     
   // recalculate XYZ positions
   hexapod_setup();
+  hexapod_loadHomeAngles();
 }
 
 

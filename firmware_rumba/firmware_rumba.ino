@@ -84,13 +84,30 @@ void help() {
   Serial.print(F("\n\nHELLO WORLD! I AM STEWART PLATFORM V4.2"));
   Serial.print(EEPROM_VERSION);
   Serial.print(F(" #"));
-  Serial.println(robot_uid);
-  Serial.println(F("Please see http://www.marginallyclever.com/ for more information."));
-  Serial.println(F("Commands:"));
-  Serial.println(F("M17/M18; - enable/disable motors"));
-  Serial.println(F("M100; - this help message"));
-  Serial.println(F("M114; - report position and feedrate"));
-  Serial.println(F("F, G00, G01, G04, G28, G90, G91 as described by http://en.wikipedia.org/wiki/G-code"));
+  Serial.println(robot_uid,DEC);
+  Serial.println(F("== http://www.marginallyclever.com/ =="));
+  Serial.println(F("I understand the following commands:"));
+  Serial.println(F("Nx [A]*y (this is line number x, with checksum y)\n"\
+"Where A is one of the following:\n"\
+"G0 [Xx] [Yy] [Zz] (move to XYZ)\n"\
+"G1 [Xx] [Yy] [Zz] (move to XYZ)\n"\
+"G2 [Xx] [Yy] [Zz] (move anticlockwise in XY plane to XYZ)\n"\
+"G3 [Xx] [Yy] [Zz] (move clockwise in XY plane to to XYZ)\n"\
+"G4 [Pp] [Ss] (wait P seconds and S milliseconds)\n"\
+"G28 (find home)\n"\
+"G54-59 [Xx] [Yy] [Zz] (adjust tool offset)\n"\
+"G90 (absolute movement mode)\n"\
+"G91 (relative movement mode)\n"\
+"M17 (disable motors)\n"\
+"M18 (enable motors)\n"\
+"M100 (help)\n"\
+"M110 N* (set line number to *)\n"\
+"M114 (where)\n"\
+"UID * (write robot UID * to EEPROM)\n"\
+"R60 [Aa] [Bb] [Cc] [Dd] [Ed] (set sensors adjustment to new value [abcde])\n"\
+"R61 (display switch adjustment)\n"\
+"R70 (write sensor adjustments to memory)\n"\
+"R71 (reset switch adjustmentles to factory default)\n"));
   // See hexapod_position() for note about why G92 is removed
 }
 

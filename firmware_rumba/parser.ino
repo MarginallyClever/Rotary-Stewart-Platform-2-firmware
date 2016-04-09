@@ -24,7 +24,7 @@ long line_number=0;
  * @input code the character to look for.
  * @input val the return value if /code/ is not found.
  **/
-float parsenumber(char code,float val) {
+float parseNumber(char code,float val) {
   char *ptr=buffer;
   while(ptr && *ptr && ptr<buffer+sofar) {
     if(*ptr==code) {
@@ -60,6 +60,23 @@ void outputvector(Vector3 &v,char*name) {
 
 
 /**
+ * Look for character /code/ in the buffer.
+ * @return /true/ if the code is found.
+ * @input code the character to look for.
+ **/
+float has_code(char code) {
+  char *ptr=buffer;  // start at the beginning of buffer
+  while(ptr && *ptr && ptr<buffer+sofar) {  // walk to the end
+    if(*ptr==code) {  // if you find code on your walk,
+      return true;
+    }
+    ptr=strchr(ptr,' ')+1;  // take a step from here to the letter after the next space
+  }
+  return false;
+}
+
+
+/**
  * Read the input buffer and find any recognized commands.  One G or M command per line.
  */
 void parser_processCommand() {
@@ -69,7 +86,7 @@ void parser_processCommand() {
   long cmd;
   
   // is there a line number?
-  cmd=parsenumber('N',-1);
+  cmd=parseNumber('N',-1);
   if(cmd!=-1 && buffer[0]=='N') {  // line number must appear first on the line
     if( cmd != line_number ) {
       // wrong line number error
@@ -105,37 +122,37 @@ void parser_processCommand() {
     saveUID();
   }
   
-  cmd = parsenumber('G',-1);
+  cmd = parseNumber('G',-1);
   switch(cmd) {
   case  0: 
   case  1: {  // move in a line
-      acceleration = min(max(parsenumber('A',acceleration),1),2000);
+      acceleration = min(max(parseNumber('A',acceleration),1),2000);
       Vector3 offset=robot_get_end_plus_offset();
-      robot_line( parsenumber('X',(mode_abs?offset.x:0)) + (mode_abs?0:offset.x),
-                  parsenumber('Y',(mode_abs?offset.y:0)) + (mode_abs?0:offset.y),
-                  parsenumber('Z',(mode_abs?offset.z:0)) + (mode_abs?0:offset.z),
-                  parsenumber('U',(mode_abs?robot.ee.r:0)) + (mode_abs?0:robot.ee.r),
-                  parsenumber('V',(mode_abs?robot.ee.p:0)) + (mode_abs?0:robot.ee.p),
-                  parsenumber('W',(mode_abs?robot.ee.y:0)) + (mode_abs?0:robot.ee.y),
-                  feedrate(parsenumber('F',feed_rate)) );
+      robot_line( parseNumber('X',(mode_abs?offset.x:0)) + (mode_abs?0:offset.x),
+                  parseNumber('Y',(mode_abs?offset.y:0)) + (mode_abs?0:offset.y),
+                  parseNumber('Z',(mode_abs?offset.z:0)) + (mode_abs?0:offset.z),
+                  parseNumber('U',(mode_abs?robot.ee.r:0)) + (mode_abs?0:robot.ee.r),
+                  parseNumber('V',(mode_abs?robot.ee.p:0)) + (mode_abs?0:robot.ee.p),
+                  parseNumber('W',(mode_abs?robot.ee.y:0)) + (mode_abs?0:robot.ee.y),
+                  feedrate(parseNumber('F',feed_rate)) );
     break;
   }
   case 2:
   case 3: { // move in an arc
-    acceleration = min(max(parsenumber('A',acceleration),1),2000);
+    acceleration = min(max(parseNumber('A',acceleration),1),2000);
     Vector3 offset=robot_get_end_plus_offset();
-    robot_arc(parsenumber('I',(mode_abs?offset.x:0)) + (mode_abs?0:offset.x),
-              parsenumber('J',(mode_abs?offset.y:0)) + (mode_abs?0:offset.y),
-              parsenumber('X',(mode_abs?offset.x:0)) + (mode_abs?0:offset.x),
-              parsenumber('Y',(mode_abs?offset.y:0)) + (mode_abs?0:offset.y),
-              parsenumber('Z',(mode_abs?offset.z:0)) + (mode_abs?0:offset.z),
+    robot_arc(parseNumber('I',(mode_abs?offset.x:0)) + (mode_abs?0:offset.x),
+              parseNumber('J',(mode_abs?offset.y:0)) + (mode_abs?0:offset.y),
+              parseNumber('X',(mode_abs?offset.x:0)) + (mode_abs?0:offset.x),
+              parseNumber('Y',(mode_abs?offset.y:0)) + (mode_abs?0:offset.y),
+              parseNumber('Z',(mode_abs?offset.z:0)) + (mode_abs?0:offset.z),
               (cmd==2) ? -1 : 1,
-              feedrate(parsenumber('F',feed_rate)) );
+              feedrate(parseNumber('F',feed_rate)) );
     break;
   }
   case  4:  {  // dwell
     wait_for_segment_buffer_to_empty();
-    pause(parsenumber('S',0) + parsenumber('P',0)*1000);  
+    pause(parseNumber('S',0) + parseNumber('P',0)*1000);  
     break;
   }
   case 28:  robot_find_home();  break;
@@ -146,9 +163,9 @@ void parser_processCommand() {
   case 58:
   case 59: {  // 54-59 tool offsets
     int tool_id=cmd-54;
-    robot_tool_offset(tool_id,parsenumber('X',robot.tool_offset[tool_id].x),
-                                parsenumber('Y',robot.tool_offset[tool_id].y),
-                                parsenumber('Z',robot.tool_offset[tool_id].z));
+    robot_tool_offset(tool_id,parseNumber('X',robot.tool_offset[tool_id].x),
+                                parseNumber('Y',robot.tool_offset[tool_id].y),
+                                parseNumber('Z',robot.tool_offset[tool_id].z));
     break;
   }
   case 90:  mode_abs=1;  break;  // absolute mode
@@ -157,27 +174,60 @@ void parser_processCommand() {
   // See hexapod_position() for note about why G92 is removed
   case 92: { // set logical position
     Vector3 offset = robot_get_end_plus_offset();
-    robot_position( parsenumber('X',offset.x),
-                    parsenumber('Y',offset.y),
-                    parsenumber('Z',offset.z),
-                    parsenumber('U',0),
-                    parsenumber('V',0),
-                    parsenumber('W',0) );
+    robot_position( parseNumber('X',offset.x),
+                    parseNumber('Y',offset.y),
+                    parseNumber('Z',offset.z),
+                    parseNumber('U',0),
+                    parseNumber('V',0),
+                    parseNumber('W',0) );
     }
     break;
   default:  break;
   }
 
-  cmd = parsenumber('M',-1);
+  cmd = parseNumber('M',-1);
   switch(cmd) {
-  case 6:  robot_tool_change(parsenumber('T',robot.current_tool));  break;
+  case 6:  robot_tool_change(parseNumber('T',robot.current_tool));  break;
   case 17:  motor_enable();  break;
   case 18:  motor_disable();  break;
   case 100:  help();  break;
-  case 110:  line_number = parsenumber('N',line_number);  break;
+  case 110:  line_number = parseNumber('N',line_number);  break;
   case 114:  robot_where();  break;
   default:  break;
   }
+  
+  cmd = parseNumber('R',-1);
+  switch(cmd) {
+  case 60: process_sensors_adjust();  break;
+  case 61: print_sensors_adjust();  break;
+  case 70: saveAdjustments();  break;
+  case 71: hexapod_setupAnglesFirstTime();  break;
+  default:  break;
+  }
+}
+
+
+void process_sensors_adjust() {
+  int i;
+  
+  for(i=0;i<NUM_AXIES;++i) {
+    if(!has_code(motor_letters[i])) continue;
+    
+    // get the new angle
+    robot.steps_to_zero[i] = parseNumber(motor_letters[i], robot.steps_to_zero[i] );
+  }
+}
+
+
+void print_sensors_adjust() {
+  int i;
+  Serial.print(F("Angles: "));
+  for(i=0;i<NUM_AXIES;++i) {
+    Serial.print(motor_letters[i]);
+    Serial.print(robot.steps_to_zero[i]);
+    Serial.print(' ');
+  }
+  Serial.println();
 }
 
 
