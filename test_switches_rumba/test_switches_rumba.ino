@@ -29,6 +29,9 @@ void loop() {
     int state=digitalRead(j);
     if(old_state[i] != state) {
       old_state[i] = state;
+      Serial.print("switch ");
+      Serial.print(i);
+      Serial.print(" on pin ");
       Serial.print(j);
       Serial.print('=');
       Serial.println(state);

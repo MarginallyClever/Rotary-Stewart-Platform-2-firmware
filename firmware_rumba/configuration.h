@@ -26,9 +26,9 @@
 
 // speed and acceleration
 #define MAX_FEEDRATE         (40000.0)  // depends on timer interrupt & hardware
-#define MIN_FEEDRATE         (500)
-#define DEFAULT_FEEDRATE     (3000.0)
-#define DEFAULT_ACCELERATION (50.0)
+#define MIN_FEEDRATE         (1)
+#define DEFAULT_FEEDRATE     (500.0)
+#define DEFAULT_ACCELERATION (1000.0)
 
 // misc
 #define NUM_AXIES            (6)
