@@ -57,6 +57,14 @@ void hexapod_setupAnglesFirstTime() {
   robot.steps_to_zero[3]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE4;
   robot.steps_to_zero[4]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE5;
   robot.steps_to_zero[5]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE6;
+
+  int i;
+  for(i=0;i<NUM_AXIES;++i) {
+    Serial.print(F("Arm "));
+    Serial.print(i);
+    Serial.print(F("="));
+    Serial.println(robot.steps_to_zero[i]);
+  }
 }
 
 

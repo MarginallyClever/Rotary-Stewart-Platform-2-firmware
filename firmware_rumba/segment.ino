@@ -342,6 +342,8 @@ ISR(TIMER1_COMPA_vect) {
       // defererencing some data so the loop runs faster.
       steps_total=working_seg->steps_total;
       steps_taken=0;
+      over[0] = steps_total / 2;
+      over[5]=over[4]=over[3]=over[2]=over[1]=over[0];
       delta[0] = working_seg->a[0].absdelta;
       delta[1] = working_seg->a[1].absdelta;
       delta[2] = working_seg->a[2].absdelta;
