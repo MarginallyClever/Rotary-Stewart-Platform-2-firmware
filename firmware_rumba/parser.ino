@@ -198,6 +198,7 @@ void parser_processCommand() {
   
   cmd = parseNumber('R',-1);
   switch(cmd) {
+  case  5: sayVersionNumber();  break;
   case 60: process_sensors_adjust();  break;
   case 61: print_sensors_adjust();  break;
   case 70: saveAdjustments();  break;
