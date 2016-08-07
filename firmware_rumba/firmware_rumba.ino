@@ -81,10 +81,9 @@ float feedrate(float nfr) {
  * display helpful information
  */
 void help() {
-  Serial.print(F("\n\nHELLO WORLD! I AM STEWART PLATFORM V4.2"));
-  Serial.print(EEPROM_VERSION);
-  Serial.print(F(" #"));
+  Serial.print(F("\n\nHELLO WORLD! I AM STEWART PLATFORM V4.2 #"));
   Serial.println(robot_uid,DEC);
+  sayVersionNumber();
   Serial.println(F("== http://www.marginallyclever.com/ =="));
   Serial.println(F("I understand the following commands:"));
   Serial.println(F("Nx [A]*y (this is line number x, with checksum y)\n"\
@@ -109,6 +108,14 @@ void help() {
 "R70 (write sensor adjustments to memory)\n"\
 "R71 (reset switch adjustmentles to factory default)\n"));
   // See hexapod_position() for note about why G92 is removed
+}
+
+
+void sayVersionNumber() {
+  char versionNumber = loadVersion();
+  
+  Serial.print(F("Firmware v"));
+  Serial.println(versionNumber,DEC);
 }
 
 

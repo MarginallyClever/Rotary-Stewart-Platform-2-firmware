@@ -93,3 +93,11 @@ void saveUID() {
   EEPROM_writeLong(ADDR_GUID,robot_uid);
 }
 
+
+/**
+ * Save the robot's unique ID
+ */
+char loadVersion() {
+  return EEPROM.read(ADDR_VERSION);
+}
+

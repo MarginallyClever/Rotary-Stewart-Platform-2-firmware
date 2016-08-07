@@ -86,6 +86,8 @@ void loop() {
   int i=0;
 
   for(i=0;i<6;++i) {
+    Serial.print("motor ");
+    Serial.println(i);
     move_motor(i);
   }
 }
@@ -94,7 +96,7 @@ void loop() {
 void move_motor(int i) {
   int j;
   
-  Serial.print("Testing forward ");
+  Serial.print("  forward ");
   Serial.println(i);
 
   digitalWrite(arms[i].motor_dir_pin,HIGH);
@@ -104,7 +106,7 @@ void move_motor(int i) {
     delayMicroseconds(MIN_STEP_DELAY);
   }
 
-  Serial.print("Testing backward ");
+  Serial.print("  backward ");
   Serial.println(i);
 
   digitalWrite(arms[i].motor_dir_pin,LOW);
