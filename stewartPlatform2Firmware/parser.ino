@@ -26,7 +26,7 @@ long line_number=0;
  **/
 float parseNumber(char code,float val) {
   char *ptr=buffer;
-  while(ptr && *ptr && ptr<buffer+sofar) {
+  while(ptr>1 && *ptr && ptr<buffer+sofar) {
     if(*ptr==code) {
       return atof(ptr+1);
     }

@@ -14,6 +14,9 @@
 #define VERBOSE              (0)  // increase this number to get more output
 #define DEBUG_SWITCHES       (0)
 
+// uncomment this line to test stepper motor wiring
+#define TEST_STEPPERS
+
 // Comms
 #define BAUD                 (57600)  // How fast is the Arduino talking?
 #define MAX_BUF              (64)  // What is the longest message we can store?
@@ -25,10 +28,12 @@
 #define MICROSTEP_PER_DEGREE (MICROSTEPS_PER_TURN/360.0)
 
 // speed and acceleration
-#define MAX_FEEDRATE         (40000.0)  // depends on timer interrupt & hardware
-#define MIN_FEEDRATE         (1)
-#define DEFAULT_FEEDRATE     (500.0)
-#define DEFAULT_ACCELERATION (1000.0)
+#define MAX_FEEDRATE         (9000.0)  // depends on timer interrupt & hardware
+#define MIN_FEEDRATE         (1.0)
+#define DEFAULT_FEEDRATE     (5000.0)
+#define DEFAULT_ACCELERATION (3000.0)
+
+#define MIN_STEP_DELAY       (50)  // used for stepper test
 
 // misc
 #define NUM_AXIES            (6)

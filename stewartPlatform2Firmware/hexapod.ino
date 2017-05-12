@@ -51,12 +51,12 @@ void hexapod_setup() {
 }
 
 void hexapod_setupAnglesFirstTime() {
-  robot.steps_to_zero[0]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE1;
-  robot.steps_to_zero[1]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE2;
-  robot.steps_to_zero[2]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE3;
-  robot.steps_to_zero[3]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE4;
-  robot.steps_to_zero[4]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE5;
-  robot.steps_to_zero[5]=MICROSTEP_PER_DEGREE * 90.00 - SWITCH_ANGLE6;
+  robot.steps_to_zero[0]=MICROSTEP_PER_DEGREE * (90.00 - SWITCH_ANGLE1);
+  robot.steps_to_zero[1]=MICROSTEP_PER_DEGREE * (90.00 - SWITCH_ANGLE2);
+  robot.steps_to_zero[2]=MICROSTEP_PER_DEGREE * (90.00 - SWITCH_ANGLE3);
+  robot.steps_to_zero[3]=MICROSTEP_PER_DEGREE * (90.00 - SWITCH_ANGLE4);
+  robot.steps_to_zero[4]=MICROSTEP_PER_DEGREE * (90.00 - SWITCH_ANGLE5);
+  robot.steps_to_zero[5]=MICROSTEP_PER_DEGREE * (90.00 - SWITCH_ANGLE6);
 
   int i;
   for(i=0;i<NUM_AXIES;++i) {

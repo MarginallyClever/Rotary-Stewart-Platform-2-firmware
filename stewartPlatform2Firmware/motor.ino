@@ -122,4 +122,32 @@ void motor_where() {
   output("3",robot.arms[3].new_step);
   output("4",robot.arms[4].new_step);
   output("5",robot.arms[5].new_step);
-} 
+}
+
+
+/**
+ * test one motor by moving it forward and back
+ */
+void move_motor(int i) {
+  int j;
+  
+  Serial.print("  forward ");
+  Serial.println(i);
+
+  digitalWrite(robot.arms[i].motor_dir_pin,HIGH);
+  for(j=0;j<MICROSTEPS_PER_TURN;++j) {
+    digitalWrite(robot.arms[i].motor_step_pin,HIGH);
+    digitalWrite(robot.arms[i].motor_step_pin,LOW);
+    delayMicroseconds(MIN_STEP_DELAY);
+  }
+
+  Serial.print("  backward ");
+  Serial.println(i);
+
+  digitalWrite(robot.arms[i].motor_dir_pin,LOW);
+  for(j=0;j<MICROSTEPS_PER_TURN;++j) {
+    digitalWrite(robot.arms[i].motor_step_pin,HIGH);
+    digitalWrite(robot.arms[i].motor_step_pin,LOW);
+    delayMicroseconds(MIN_STEP_DELAY);
+  }
+}
