@@ -15,7 +15,7 @@
 #define DEBUG_SWITCHES       (0)
 
 // uncomment this line to test stepper motor wiring
-#define TEST_STEPPERS
+//#define TEST_STEPPERS
 
 // Comms
 #define BAUD                 (57600)  // How fast is the Arduino talking?
