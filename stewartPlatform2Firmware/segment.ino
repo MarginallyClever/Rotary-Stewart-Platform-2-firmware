@@ -173,12 +173,12 @@ void recalculate_forward() {
 
 
 int intersection_time(float acceleration,float distance,float start_speed,float end_speed) {
-#if 0
+//#if 0
   return ( ( 2.0*acceleration*distance - start_speed*start_speed + end_speed*end_speed ) / (4.0*acceleration) );
-#else
+/*#else
   float t2 = ( start_speed - end_speed + acceleration * distance ) / ( 2.0 * acceleration );
   return distance - t2;
-#endif
+#endif*/
 }
 
 
